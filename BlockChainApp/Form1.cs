@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Dal.Dal;
 
 namespace BlockChainApp
 {
@@ -15,6 +16,12 @@ namespace BlockChainApp
         public Form1()
         {
             InitializeComponent();
+            var context = new SqLiteContext();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
