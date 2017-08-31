@@ -8,15 +8,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dal.Dal;
+using Dal.Interfaces;
 
 namespace BlockChainApp
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        public Form1(IDbContext _context)
         {
             InitializeComponent();
-            var context = new SqLiteContext();
         }
 
         private void Form1_Load(object sender, EventArgs e)

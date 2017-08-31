@@ -59,12 +59,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dal\Parent\BaseRepository.cs" />
     <Compile Include="Dal\SqLiteConfiguration.cs" />
     <Compile Include="Dal\SqLiteContext.cs" />
     <Compile Include="Entitites\Chain.cs" />
     <Compile Include="Entitites\Parent\DbEntity.cs" />
     <Compile Include="Interfaces\IDbContext.cs" />
     <Compile Include="Interfaces\IDbEntity.cs" />
+    <Compile Include="Interfaces\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

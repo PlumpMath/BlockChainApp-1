@@ -16,15 +16,15 @@ namespace Dal.Interfaces
 
         #region Функции
 
-        IQueryable<T> GetAll<T>() where T : class;
+        IQueryable<TEntity> GetAll<TEntity>() where TEntity : class;
 
-        void MarkAsAdded<T>(T entity) where T : class;
+        void MarkAsAdded<TEntity>(TEntity entity) where TEntity : class;
 
-        void MarkAsDeleted<T>(T entity) where T : class;
+        void MarkAsDeleted<TEntity>(TEntity entity) where TEntity : class;
 
-        void MarkAsModified<T>(T entity) where T : class;
+        void MarkAsModified<TEntity>(TEntity entity) where TEntity : class;
 
-        void Attach<T>(T entity) where T : class;
+        void Attach<TEntity>(TEntity entity) where TEntity : class;
 
         void Commit();
 
@@ -34,14 +34,14 @@ namespace Dal.Interfaces
         // включает или отключает отслеживание изменений объектов
         void EnableTracking(bool isEnable);
 
-        EntityState GetEntityState<T>(T entity) where T : class;
+        EntityState GetEntityState<TEntity>(TEntity entity) where TEntity : class;
 
-        void SetEntityState<T>(T entity, EntityState state) where T : class;
+        void SetEntityState<TEntity>(TEntity entity, EntityState state) where TEntity : class;
 
         // возвращает объект содержащий список объектов с их состоянием
         DbChangeTracker GetChangeTracker();
 
-        DbEntityEntry GetDbEntry<T>(T entity) where T : class;
+        DbEntityEntry GetDbEntry<TEntity>(TEntity entity) where TEntity : class;
 
         #endregion
     }

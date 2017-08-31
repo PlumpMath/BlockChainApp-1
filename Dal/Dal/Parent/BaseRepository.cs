@@ -74,5 +74,10 @@ namespace Dal.Dal.Parent
         {
 
         }
+
+        public DbEntityValidationResult Validate(TEntity entity)
+        {
+            return _context.GetDbEntry(entity).GetValidationResult();
+        }
     }
 }
