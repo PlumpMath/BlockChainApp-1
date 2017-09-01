@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using ExchangeApplication.ViewModels;
+using ExchangeApplication.Views;
 using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Interfaces;
@@ -115,6 +116,22 @@ namespace ExchangeApplication
             ListView_BlockChain.Items.Add(new ChainViewModel(chain));
             ListView_BlockChain.SelectedIndex = ListView_BlockChain.Items.Count - 1;
             ListView_BlockChain.ScrollIntoView(ListView_BlockChain.SelectedItem);
+        }
+
+        private void ListView_BlockChain_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var chainViewModel = ListView_BlockChain.SelectedItem as ChainViewModel;
+            if (chainViewModel == null)
+            {
+                throw new InvalidCastException();
+            }
+
+            IUserStorage storage = DI.Get<IUserStorage>();
+            chainViewModel.SellerName = storage.GetEntity(chainViewModel.SellerId).Name;
+            chainViewModel.BuyerName = storage.GetEntity(chainViewModel.BuyerId).Name;
+
+            var chainView = new ChainView(chainViewModel);
+            chainView.Show();
         }
     }
 }
