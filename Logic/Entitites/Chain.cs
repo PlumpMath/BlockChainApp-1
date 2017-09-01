@@ -12,7 +12,7 @@ namespace Logic.Entitites
 
         public long BuyerId { get; }
 
-        public string TransactionComment { get; }
+        public double TransactionComission { get; }
 
         public double TransactionValue { get; }
 
@@ -22,12 +22,12 @@ namespace Logic.Entitites
 
         public string CurrentHash { get; set; }
 
-        public Chain(long sellerId, long buyerId, string transactionComment, double transactionValue)
+        public Chain(long sellerId, long buyerId, double transactionComission, double transactionValue)
         {
             Id = 0;
             SellerId = sellerId;
             BuyerId = buyerId;
-            TransactionComment = transactionComment;
+            TransactionComission = transactionComission;
             TransactionValue = transactionValue;
             CreatedAt = DateTime.UtcNow;
             CurrentHash = null;
@@ -39,17 +39,8 @@ namespace Logic.Entitites
             {
                 throw new ArgumentNullException(nameof(PreviousHash));
             } 
-            string text = $"{Id}{SellerId}{BuyerId}{TransactionComment}{TransactionValue}{PreviousHash}{CreatedAt}";
+            string text = $"{Id}{SellerId}{BuyerId}{TransactionComission}{TransactionValue}{PreviousHash}{CreatedAt}";
             CurrentHash = MiscUtils.HashEncode(text);
-        }
-
-        public override string ToString()
-        {
-            return $"Id {Id}. SellerId {SellerId}, BuyerId {BuyerId}. " +
-                   $"TransactionValue {TransactionValue}. " +
-                   $"Date {CreatedAt}\r\n" +
-                   $"PrevHash {PreviousHash}\r\n" +
-                   $"CurrHash {CurrentHash}\r\n";
         }
     }
 }

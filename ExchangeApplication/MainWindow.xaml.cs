@@ -15,7 +15,9 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using ExchangeApplication.ViewModels;
 using Logic.DependencyInjector;
+using Logic.Entitites;
 using Logic.Interfaces;
+using Logic.Storages;
 using Utilities.Common;
 
 namespace ExchangeApplication
@@ -23,18 +25,28 @@ namespace ExchangeApplication
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IExchangeEventListener
     {
         private readonly IExchange _exchange;
 
         private readonly IBank _bank;
 
+        private readonly IChainStorage _chainStorage;
+
         private readonly DispatcherTimer _exchangeTimer;
+
+        private const int DepositPayoutTick = 9;
+
+        private int _depositPayoutTickCount = 0;
 
         public MainWindow(IExchange exchange)
         {
             _exchange = exchange;
+            _exchange.SetChainChangeListener(this);
+
             _bank = DI.Get<IBank>();
+            _chainStorage = DI.Get<IChainStorage>();
+
             InitializeComponent();
             FillData();
 
@@ -48,6 +60,16 @@ namespace ExchangeApplication
         private void _exchangeTimer_Tick(object sender, EventArgs e)
         {
             _exchange.ExecuteExchanging();
+            if (_depositPayoutTickCount == DepositPayoutTick)
+            {
+                _exchange.PayoutDepositPercents();
+                _depositPayoutTickCount = 1;
+            }
+            else
+            {
+                _depositPayoutTickCount++;
+            }
+
             FillData();
         }
 
@@ -76,6 +98,23 @@ namespace ExchangeApplication
                 : "Закрыть торги";
             Button_StartStopExchange.Content = title;
             _exchangeTimer.IsEnabled = !_exchangeTimer.IsEnabled;
+
+            
+        }
+
+        public void CommonMessage(string message)
+        {
+            TextBox_Log.Text += DateTime.Now.ToShortTimeString() + ") " 
+                + message + Environment.NewLine;
+            TextBox_Log.ScrollToEnd();
+            TextBox_Log.CaretIndex = TextBox_Log.Text.Length - 1;
+        }
+
+        public void Transaction(Chain chain)
+        {
+            ListView_BlockChain.Items.Add(new ChainViewModel(chain));
+            ListView_BlockChain.SelectedIndex = ListView_BlockChain.Items.Count - 1;
+            ListView_BlockChain.ScrollIntoView(ListView_BlockChain.SelectedItem);
         }
     }
 }

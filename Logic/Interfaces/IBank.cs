@@ -6,7 +6,7 @@
 
         void CreateAccount(IExchangeUser user, int seed = 0);
 
-        void IncreaseAccountMoneyValue();
+        double PayoutDepositPercent();
 
         double GetMoneyAmount();
 
@@ -16,6 +16,6 @@
 
         void WithdrawMoney(long userId, double value);
 
-        bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice);
+        bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice, out double comission);
     }
 }

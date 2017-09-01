@@ -47,14 +47,13 @@ namespace ExchangeApplication
 
             var users = new List<IExchangeUser>();
             users.AddRange(DI.Get<IUserStorage>().GetAll());
-            users.Add((IExchangeUser)bank);
 
             for (var index = 0; index < users.Count; index++)
             {
                 IExchangeUser user = users[index];
                 bank.CreateAccount(user, index);
             }
-
+            users.Add((IExchangeUser)bank);
 
             var exchange = new Exchange(bank, chainStorage, users);
             return exchange;

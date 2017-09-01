@@ -45,6 +45,11 @@ namespace Utilities.Common
             return _names.GetRandomEntity(seed);
         }
 
+        public static bool ContinueByRandom(int seed = 0)
+        {
+            return GetRandomNumber(1, seed: seed) == 1;
+        } 
+
         private static readonly IEnumerable<string> _names = new string[]
         {
             "Noah",

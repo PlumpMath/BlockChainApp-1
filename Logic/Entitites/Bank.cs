@@ -8,13 +8,20 @@ namespace Logic.Entitites
 {
     public class Bank : ExchangeUserBase, IBank
     {
-        private const double BankComission = 0.05;
+        private const double StartCapital = 21000000;
 
-        private const double DepositPercent = 0.5;
+        private const double BankComission = 0.01;
 
-        private double _allMoney;
+        private const double DepositPercent = 0.05;
 
-        private const double MaximumByHands = 10000;
+        // Всеми деньгами считается собственный счет банка
+        public double AllMoney
+        {
+            get => GetAccountByUserId(this.Id).AccountValue;
+            set => GetAccountByUserId(this.Id).AccountValue = value;
+        }
+
+        private const double MaximumByHands = 100000;
 
         private readonly List<BankAccount> _accounts;
 
@@ -23,19 +30,30 @@ namespace Logic.Entitites
             // Как будто самый старший игрок на рынке
             Id = 1000;
 
-            _allMoney = 21000000;
-            _accounts = new List<BankAccount>();
+            // При создании открывается свой же собственный счет
+            _accounts = new List<BankAccount>
+            {
+                new BankAccount
+                {
+                    UserId = this.Id,
+                    AccountValue = StartCapital
+                }
+            };
+
             Name = "Bank of Bitcoins";
         }
 
         public double GetRandomMoney(int seed = 0)
         {
             double amount = MiscUtils.GetRandomNumber(MaximumByHands, seed: seed);
-            _allMoney -= amount;
+            AllMoney -= amount;
             return amount;
         }
 
-        public double GetMoneyAmount() => _allMoney;
+        public double GetMoneyAmount()
+        {
+            return _accounts.Sum(account => account.AccountValue);
+        }
 
         public double GetAccountValue(long userId)
         {
@@ -47,43 +65,44 @@ namespace Logic.Entitites
         {
             BankAccount account = GetAccountByUserId(userId);
             account.AccountValue += value;
-            SyncBankAccountMoney();
         }
 
         public void WithdrawMoney(long userId, double value)
         {
             BankAccount account = GetAccountByUserId(userId);
             account.AccountValue -= value;
-            SyncBankAccountMoney();
         }
 
-        public bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice)
+        public bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice, out double comission)
         {
             BankAccount buyerAccount = GetAccountByUserId(buyer.Id);
             // Если нет денег
-            if (buyerAccount.AccountValue < invoice) return false;
+            if (buyerAccount.AccountValue < invoice)
+            {
+                comission = 0;
+                return false;
+            }
 
             BankAccount sellerAccount = GetAccountByUserId(seller.Id);
-            double comission = CalculateComission(invoice);
+            comission = CalculateComission(invoice);
 
             sellerAccount.AccountValue += invoice - comission;
             buyerAccount.AccountValue -= invoice;
 
-            SyncBankAccountMoney();
             return true;
         }
 
         public double CalculateComission(double invoice)
         {
-            _allMoney += invoice * BankComission;
-            SyncBankAccountMoney();
-            return invoice * BankComission;
+            var result = invoice * BankComission;
+            AllMoney += result;
+            return result;
         }
 
         public void CreateAccount(IExchangeUser user, int seed = 0)
         {
             double money = user is Bank 
-                ? _allMoney 
+                ? AllMoney 
                 : GetRandomMoney(seed);
             _accounts.Add(new BankAccount
             {
@@ -92,18 +111,20 @@ namespace Logic.Entitites
             });
         }
 
-        public void IncreaseAccountMoneyValue()
+        public double PayoutDepositPercent()
         {
+            double allPercents = 0;
             foreach (BankAccount account in _accounts)
             {
                 double percent = account.AccountValue * DepositPercent;
                 if (account.UserId == this.Id 
-                    || _allMoney < percent) continue;
+                    || AllMoney < percent) continue;
 
-                _allMoney -= percent;
+                allPercents += percent;
+                AllMoney -= percent;
                 account.AccountValue += percent;
             }
-            SyncBankAccountMoney();
+            return allPercents;
         }
 
         private BankAccount GetAccountByUserId(long userId)
@@ -111,12 +132,6 @@ namespace Logic.Entitites
             var result = _accounts.SingleOrDefault(ac => ac.UserId == userId);
             if (result == null) throw new NullReferenceException(nameof(result));
             return result;
-        }
-
-        private void SyncBankAccountMoney()
-        {
-            var mine = GetAccountByUserId(this.Id);
-            mine.AccountValue = _allMoney;
         }
     }
 

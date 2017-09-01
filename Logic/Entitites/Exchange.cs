@@ -9,13 +9,15 @@ namespace Logic.Entitites
 {
     public class Exchange : IExchange
     {
+        private const double MaxTransactionPrice = 5000;
+
         private readonly List<IExchangeUser> _exchangeUsers;
 
         private readonly IBank _bank;
 
         private readonly IChainStorage _chainStorage;
 
-        private IChainChangeListener _chainChangeListener;
+        private IExchangeEventListener _exchangeEventListener;
 
         public Exchange(IBank bank, IChainStorage chainStorage, IEnumerable<IExchangeUser> users)
         {
@@ -33,27 +35,37 @@ namespace Logic.Entitites
 
         public void ExecuteExchanging()
         {
-            foreach (IExchangeUser user in _exchangeUsers)
+            for (var index = 0; index < _exchangeUsers.Count; index++)
             {
+                if (MiscUtils.ContinueByRandom(index))
+                {
+                    continue;
+                } 
+                IExchangeUser user = _exchangeUsers[index];
                 IExchangeUser contrAgent = GetContrAgent(user.Id);
-                double invoice = MiscUtils.GetRandomNumber(1000.0);
+                double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice, seed: index);
 
-                if (!_bank.TransferMoney(user, contrAgent, invoice)) continue;
+                if (!_bank.TransferMoney(user, contrAgent, invoice, out double comission))
+                {
+                    continue;
+                }
 
                 Chain chain = new Chain(
-                    sellerId: user.Id, 
+                    sellerId: user.Id,
                     buyerId: contrAgent.Id,
                     transactionValue: invoice,
-                    transactionComment: $"Invoice: {invoice}");
+                    transactionComission: comission);
 
                 _chainStorage.Save(chain);
-                _chainChangeListener?.NewChainAdded(chain);
+                _exchangeEventListener?.Transaction(chain);
             }
         }
 
-        public void IncreaseAccountValues()
+        public void PayoutDepositPercents()
         {
-            _bank.IncreaseAccountMoneyValue();
+            double allPercents = _bank.PayoutDepositPercent();
+            var text = $"Выплачены проценты по депозитам {MiscUtils.FormatDouble(allPercents)}";
+            _exchangeEventListener?.CommonMessage(text);
         }
 
 
@@ -64,9 +76,9 @@ namespace Logic.Entitites
                 .GetRandomEntity();
         }
 
-        public void SetChainChangeListener(IChainChangeListener listener)
+        public void SetChainChangeListener(IExchangeEventListener listener)
         {
-            _chainChangeListener = listener;
+            _exchangeEventListener = listener;
         }
     }
 }

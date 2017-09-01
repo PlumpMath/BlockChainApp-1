@@ -9,8 +9,8 @@ namespace Logic.Interfaces
 
         void ExecuteExchanging();
 
-        void IncreaseAccountValues();
+        void PayoutDepositPercents();
 
-        void SetChainChangeListener(IChainChangeListener listener);
+        void SetChainChangeListener(IExchangeEventListener listener);
     }
 }

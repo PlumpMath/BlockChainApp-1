@@ -50,7 +50,7 @@
     <Compile Include="Entitites\Bank.cs" />
     <Compile Include="Fabric\UserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
-    <Compile Include="Interfaces\IChainChangeListener.cs" />
+    <Compile Include="Interfaces\IExchangeEventListener.cs" />
     <Compile Include="Interfaces\IExchange.cs" />
     <Compile Include="Interfaces\IExchangeUser.cs" />
     <Compile Include="Interfaces\IFabric.cs" />
