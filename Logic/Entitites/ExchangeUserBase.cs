@@ -10,8 +10,6 @@ namespace Logic.Entitites
 
         public DateTime CreatedAt { get; }
 
-        public double Wallet => DI.Get<IBank>().GetAccountValue(this);
-
         public string Name { get; set; }
 
         public ExchangeUserBase()
@@ -22,7 +20,7 @@ namespace Logic.Entitites
 
         public override string ToString()
         {
-            return $"{Name}. Account {Wallet}";
+            return $"{Name}";
         }
     }
 }

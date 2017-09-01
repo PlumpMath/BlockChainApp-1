@@ -37,26 +37,24 @@ namespace Logic.Entitites
 
         public double GetMoneyAmount() => _allMoney;
 
-        public double GetAccountValue(IExchangeUser user)
+        public double GetAccountValue(long userId)
         {
-            BankAccount account = _accounts.SingleOrDefault(ac => ac.UserId == user.Id);
-            if (account == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
+            BankAccount account = GetAccountByUserId(userId);
             return account.AccountValue;
         }
 
-        public void PutMoneyToTheAccount(IExchangeUser user, double value)
+        public void PutMoneyToTheAccount(long userId, double value)
         {
-            BankAccount account = GetAccountByUserId(user.Id);
+            BankAccount account = GetAccountByUserId(userId);
             account.AccountValue += value;
+            SyncBankAccountMoney();
         }
 
-        public void WithdrawMoney(IExchangeUser user, double value)
+        public void WithdrawMoney(long userId, double value)
         {
-            BankAccount account = GetAccountByUserId(user.Id);
+            BankAccount account = GetAccountByUserId(userId);
             account.AccountValue -= value;
+            SyncBankAccountMoney();
         }
 
         public bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice)
@@ -71,18 +69,22 @@ namespace Logic.Entitites
             sellerAccount.AccountValue += invoice - comission;
             buyerAccount.AccountValue -= invoice;
 
+            SyncBankAccountMoney();
             return true;
         }
 
         public double CalculateComission(double invoice)
         {
             _allMoney += invoice * BankComission;
+            SyncBankAccountMoney();
             return invoice * BankComission;
         }
 
         public void CreateAccount(IExchangeUser user, int seed = 0)
         {
-            double money = GetRandomMoney(seed);
+            double money = user is Bank 
+                ? _allMoney 
+                : GetRandomMoney(seed);
             _accounts.Add(new BankAccount
             {
                 UserId = user.Id,
@@ -95,10 +97,13 @@ namespace Logic.Entitites
             foreach (BankAccount account in _accounts)
             {
                 double percent = account.AccountValue * DepositPercent;
-                if (_allMoney < percent) continue;
+                if (account.UserId == this.Id 
+                    || _allMoney < percent) continue;
 
+                _allMoney -= percent;
                 account.AccountValue += percent;
             }
+            SyncBankAccountMoney();
         }
 
         private BankAccount GetAccountByUserId(long userId)
@@ -106,6 +111,12 @@ namespace Logic.Entitites
             var result = _accounts.SingleOrDefault(ac => ac.UserId == userId);
             if (result == null) throw new NullReferenceException(nameof(result));
             return result;
+        }
+
+        private void SyncBankAccountMoney()
+        {
+            var mine = GetAccountByUserId(this.Id);
+            mine.AccountValue = _allMoney;
         }
     }
 

@@ -35,6 +35,11 @@ namespace Utilities.Common
             return rnd.NextDouble() * (max - min) + min;
         }
 
+        public static string FormatDouble(double number, string format = "0.##")
+        {
+            return number.ToString(format);
+        }
+
         public static string GetRandomName(int seed = 0)
         {
             return _names.GetRandomEntity(seed);

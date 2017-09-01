@@ -10,11 +10,11 @@
 
         double GetMoneyAmount();
 
-        double GetAccountValue(IExchangeUser user);
+        double GetAccountValue(long userId);
 
-        void PutMoneyToTheAccount(IExchangeUser user, double value);
+        void PutMoneyToTheAccount(long userId, double value);
 
-        void WithdrawMoney(IExchangeUser user, double value);
+        void WithdrawMoney(long userId, double value);
 
         bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice);
     }
