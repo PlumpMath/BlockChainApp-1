@@ -1,4 +1,5 @@
 ﻿using System;
+using Logic.DependencyInjector;
 using Logic.Interfaces;
 
 namespace Logic.Entitites
@@ -9,7 +10,7 @@ namespace Logic.Entitites
 
         public DateTime CreatedAt { get; }
 
-        public double Wallet { get; set; }
+        public double Wallet => DI.Get<IBank>().GetAccountValue(this);
 
         public string Name { get; set; }
 
@@ -17,21 +18,6 @@ namespace Logic.Entitites
         {
             Id = 0;
             CreatedAt = DateTime.UtcNow;
-        }
-
-        public bool WithdrawMoney(double invoice)
-        {
-            if (Wallet < invoice)
-            {
-                return false;
-            }
-            Wallet -= invoice;
-            return true;
-        }
-
-        public void TakeMoney(double invoice)
-        {
-            Wallet += invoice;
         }
 
         public override string ToString()

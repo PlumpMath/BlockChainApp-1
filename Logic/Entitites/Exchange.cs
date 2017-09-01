@@ -15,6 +15,8 @@ namespace Logic.Entitites
 
         private readonly IChainStorage _chainStorage;
 
+        private IChainChangeListener _chainChangeListener;
+
         public Exchange(IBank bank, IChainStorage chainStorage, IEnumerable<IExchangeUser> users)
         {
             _bank = bank;
@@ -36,12 +38,7 @@ namespace Logic.Entitites
                 IExchangeUser contrAgent = GetContrAgent(user.Id);
                 double invoice = MiscUtils.GetRandomNumber(1000.0);
 
-                if (!contrAgent.WithdrawMoney(invoice)) continue;
-
-                double comission = _bank.CalculateComission(invoice);
-
-                invoice -= comission;
-                user.TakeMoney(invoice);
+                if (!_bank.TransferMoney(user, contrAgent, invoice)) continue;
 
                 Chain chain = new Chain(
                     sellerId: user.Id, 
@@ -50,6 +47,7 @@ namespace Logic.Entitites
                     transactionComment: $"Invoice: {invoice}");
 
                 _chainStorage.Save(chain);
+                _chainChangeListener?.NewChainAdded(chain);
             }
         }
 
@@ -64,6 +62,11 @@ namespace Logic.Entitites
             return _exchangeUsers
                 .Where(user => user.Id != excludeId)
                 .GetRandomEntity();
+        }
+
+        public void SetChainChangeListener(IChainChangeListener listener)
+        {
+            _chainChangeListener = listener;
         }
     }
 }

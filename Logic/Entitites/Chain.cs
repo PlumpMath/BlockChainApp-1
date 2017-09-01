@@ -42,5 +42,14 @@ namespace Logic.Entitites
             string text = $"{Id}{SellerId}{BuyerId}{TransactionComment}{TransactionValue}{PreviousHash}{CreatedAt}";
             CurrentHash = MiscUtils.HashEncode(text);
         }
+
+        public override string ToString()
+        {
+            return $"Id {Id}. SellerId {SellerId}, BuyerId {BuyerId}. " +
+                   $"TransactionValue {TransactionValue}. " +
+                   $"Date {CreatedAt}\r\n" +
+                   $"PrevHash {PreviousHash}\r\n" +
+                   $"CurrHash {CurrentHash}\r\n";
+        }
     }
 }

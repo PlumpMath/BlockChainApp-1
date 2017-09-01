@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Reflection;
-using System.Windows.Forms;
 using Autofac;
-using Logic;
 using Logic.Entitites;
 using Logic.Fabric;
 using Logic.Storages;
 
-namespace BlockChainApp.DependencyInjector
+namespace Logic.DependencyInjector
 {
     public class AutofacConfig
     {

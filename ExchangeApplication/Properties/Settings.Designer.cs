@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BlockChainApp.Properties
+namespace ExchangeApplication.Properties
 {
 
 

@@ -10,5 +10,7 @@ namespace Logic.Interfaces
         void ExecuteExchanging();
 
         void IncreaseAccountValues();
+
+        void SetChainChangeListener(IChainChangeListener listener);
     }
 }

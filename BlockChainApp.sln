@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockChainApp", "BlockChainApp\BlockChainApp.csproj", "{6C36B453-2398-42FC-A694-F86FAC24BB60}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj", "{2B70A2B2-814A-4070-BED5-9982A88E6916}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExchangeApplication", "ExchangeApplication\ExchangeApplication.csproj", "{3700A29B-8362-42C4-96B0-5BD5F9E4DD69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6C36B453-2398-42FC-A694-F86FAC24BB60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6C36B453-2398-42FC-A694-F86FAC24BB60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6C36B453-2398-42FC-A694-F86FAC24BB60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6C36B453-2398-42FC-A694-F86FAC24BB60}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2B70A2B2-814A-4070-BED5-9982A88E6916}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B70A2B2-814A-4070-BED5-9982A88E6916}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B70A2B2-814A-4070-BED5-9982A88E6916}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -27,6 +23,10 @@ Global
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3700A29B-8362-42C4-96B0-5BD5F9E4DD69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3700A29B-8362-42C4-96B0-5BD5F9E4DD69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3700A29B-8362-42C4-96B0-5BD5F9E4DD69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3700A29B-8362-42C4-96B0-5BD5F9E4DD69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

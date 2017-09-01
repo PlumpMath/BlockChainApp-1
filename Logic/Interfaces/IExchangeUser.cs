@@ -2,12 +2,8 @@
 {
     public interface IExchangeUser : IIdentificable
     {
-        double Wallet { get; set; }
+        double Wallet { get; }
 
         string Name { get; }
-
-        bool WithdrawMoney(double invoice);
-
-        void TakeMoney(double invoice);
     }
 }

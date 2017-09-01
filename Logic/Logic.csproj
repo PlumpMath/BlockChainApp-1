@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=4.6.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -40,12 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DependencyInjector\AutofacConfig.cs" />
     <Compile Include="Entitites\Exchange.cs" />
     <Compile Include="Entitites\ExchangeUserBase.cs" />
     <Compile Include="Entitites\User.cs" />
     <Compile Include="Entitites\Bank.cs" />
     <Compile Include="Fabric\UserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
+    <Compile Include="Interfaces\IChainChangeListener.cs" />
     <Compile Include="Interfaces\IExchange.cs" />
     <Compile Include="Interfaces\IExchangeUser.cs" />
     <Compile Include="Interfaces\IFabric.cs" />
@@ -57,7 +62,9 @@
     <Compile Include="Storages\EntityMemoryStorageBase.cs" />
     <Compile Include="Storages\UserMemoryStorage.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utilities\Utilities.csproj">
       <Project>{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}</Project>

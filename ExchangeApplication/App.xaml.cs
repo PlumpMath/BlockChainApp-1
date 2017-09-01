@@ -1,29 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using Autofac;
-using BlockChainApp.DependencyInjector;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Fabric;
 using Logic.Interfaces;
 using Logic.Storages;
 
-namespace BlockChainApp
+namespace ExchangeApplication
 {
-    static class Program
+    /// <summary>
+    /// Логика взаимодействия для App.xaml
+    /// </summary>
+    public partial class App : Application
     {
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
-        [STAThread]
-        static void Main()
+        // https://stackoverflow.com/a/10276293
+        private void Application_Startup(object sender, StartupEventArgs e)
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
             AutofacConfig.ConfigureContainer();
-
             FillUsers();
-            Application.Run(new MainForm(CreateExchange()));
+            IExchange exchange = CreateExchange();
+
+            MainWindow mainWindow = new MainWindow(exchange);
+            mainWindow.Show();
         }
 
         private static void FillUsers()
@@ -45,9 +48,16 @@ namespace BlockChainApp
             var users = new List<IExchangeUser>();
             users.AddRange(DI.Get<IUserStorage>().GetAll());
             users.Add((IExchangeUser)bank);
+
+            for (var index = 0; index < users.Count; index++)
+            {
+                IExchangeUser user = users[index];
+                bank.CreateAccount(user, index);
+            }
+
+
             var exchange = new Exchange(bank, chainStorage, users);
             return exchange;
         }
     }
-
 }
