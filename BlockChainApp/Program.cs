@@ -1,9 +1,12 @@
 ﻿using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using Autofac;
 using BlockChainApp.DependencyInjector;
-using Dal.Interfaces;
+using Logic.Entitites;
+using Logic.Fabric;
+using Logic.Interfaces;
+using Logic.Storages;
 
 namespace BlockChainApp
 {
@@ -17,25 +20,34 @@ namespace BlockChainApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            AutofacConfig.ConfigureContainer();
 
-            IContainer container = AutofacConfig.ConfigureContainer();
-            DI.SetContainer(container);
-            Application.Run(new Form1(DI.Get<IDbContext>()));
+            FillUsers();
+            Application.Run(new MainForm(CreateExchange()));
+        }
+
+        private static void FillUsers()
+        {
+            IUserFactory factory = DI.Get<IUserFactory>();
+            IUserStorage storage = DI.Get<IUserStorage>();
+            for (var i = 0; i < 10; i++)
+            {
+                User user = factory.GenerateEntity(i);
+                storage.Save(user);
+            }
+        }
+
+        private static IExchange CreateExchange()
+        {
+            IBank bank = DI.Get<IBank>();
+            IChainStorage chainStorage = DI.Get<IChainStorage>();
+
+            var users = new List<IExchangeUser>();
+            users.AddRange(DI.Get<IUserStorage>().GetAll());
+            users.Add((IExchangeUser)bank);
+            var exchange = new Exchange(bank, chainStorage, users);
+            return exchange;
         }
     }
 
-    public static class DI
-    {
-        private static IContainer _container;
-
-        public static void SetContainer(IContainer container)
-        {
-            _container = container;
-        }
-
-        public static TInterface Get<TInterface>()
-        {
-            return _container.Resolve<TInterface>();
-        }
-    }
 }

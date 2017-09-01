@@ -1,28 +1,67 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Windows.Forms;
 using Autofac;
-using Dal.Dal;
-using Dal.Interfaces;
+using Logic;
+using Logic.Entitites;
+using Logic.Fabric;
+using Logic.Storages;
 
 namespace BlockChainApp.DependencyInjector
 {
     public class AutofacConfig
     {
-        public static IContainer ConfigureContainer()
+        public static void ConfigureContainer()
         {
             // получаем экземпляр контейнера
             var builder = new ContainerBuilder();
 
-            var assembly = Assembly.GetExecutingAssembly();
-            builder.RegisterAssemblyTypes(assembly)
-                .Where(type => type.IsSubclassOf(typeof(Form)));
-
             // регистрируем споставление типов
-            builder.RegisterType<SqLiteContext>().AsImplementedInterfaces();
+            builder.RegisterType<UserFabric>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<ChainMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+            builder.RegisterType<UserMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<Bank>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
-            IContainer container = builder.Build();
-            return container;
+            DI.SetContainer(builder.Build());
         }
     }
+
+    #region DependencyInjection
+
+    public static class DI
+    {
+        private static IContainer _container;
+
+        public static void SetContainer(IContainer container)
+        {
+            if (_container != null)
+            {
+                throw new ArgumentException(nameof(container));
+            }
+            _container = container;
+        }
+
+        public static TInterface Get<TInterface>()
+        {
+            if (_container == null)
+            {
+                throw new NullReferenceException(nameof(_container));
+            }
+            return _container.Resolve<TInterface>();
+        }
+    }
+
+    #endregion
 }

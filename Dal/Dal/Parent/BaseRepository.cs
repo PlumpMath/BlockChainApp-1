@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity.Validation;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Dal.Dal.Parent
             _context = context;
         }
 
-        public IQueryable GetAll()
+        public IQueryable<TEntity> GetAll()
         {
             return _context.GetAll<TEntity>();
         }

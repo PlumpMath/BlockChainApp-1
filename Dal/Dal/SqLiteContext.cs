@@ -4,28 +4,37 @@ using System.Configuration;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using Dal.Entitites;
 using Dal.Interfaces;
+using Dal.Migrations;
 
 namespace Dal.Dal
 {
-    [DbConfigurationType(typeof(SqLiteConfiguration))]
     public class SqLiteContext : DbContext, IDbContext
     {
 
-        private static readonly SQLiteConnection connection = new SQLiteConnection
-        {
-            ConnectionString = new SQLiteConnectionStringBuilder
-            {
-                DataSource = Environment.CurrentDirectory+ "\\Data\\Database.db", ForeignKeys = true
-            }.ConnectionString
-        };
+        private static readonly string _pathToDb
+            = Path.Combine(Environment.CurrentDirectory, @"Data\database.db");
+
+        private static readonly string _connection = $"Data Source={_pathToDb}";
 
         public SqLiteContext() 
-            : base(connection, true)
+            : base(_connection)
         {
+            if (!Directory.Exists(Environment.CurrentDirectory + "\\Data"))
+            {
+                Directory.CreateDirectory("\\Data");
+            }
         }
+
+        static SqLiteContext()
+        {
+            //устанавливаем инициализатор
+            Database.SetInitializer(new CreateDatabaseIfNotExists<SqLiteContext>());
+        }
+
 
         public DbSet<Chain> Chains { get; set; }
 
@@ -136,16 +145,6 @@ namespace Dal.Dal
         public DbEntityEntry GetDbEntry<TEntity>(TEntity entity) where TEntity : class
         {
             return Entry(entity);
-        }
-
-        #endregion
-
-        #region Вспомогательные методы
-
-        static SqLiteContext()
-        {
-            //устанавливаем инициализатор
-            Database.SetInitializer(new CreateDatabaseIfNotExists<SqLiteContext>());
         }
 
         #endregion

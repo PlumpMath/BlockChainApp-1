@@ -1,14 +1,13 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Dal.Entitites.Parent;
+using Logic.Interfaces;
 using Utilities.Common;
-using System.Data.SQLite;
 
-namespace Dal.Entitites
+namespace Logic.Entitites
 {
-    public class Chain : DbEntity
+    public class Chain : IIdentificable
     {
+        public long Id { get; set; }
+
         public long SellerId { get; }
 
         public long BuyerId { get; }
@@ -17,28 +16,31 @@ namespace Dal.Entitites
 
         public double TransactionValue { get; }
 
-        public string PreviousHash { get; }
+        public string PreviousHash { get; set; }
 
         public DateTime CreatedAt { get; }
 
-        public string CurrentHash { get; }
+        public string CurrentHash { get; set; }
 
-        public Chain(long id, long sellerId, long buyerId, string transactionComment, double transactionValue, string previousHash)
+        public Chain(long sellerId, long buyerId, string transactionComment, double transactionValue)
         {
-            Id = id;
+            Id = 0;
             SellerId = sellerId;
             BuyerId = buyerId;
             TransactionComment = transactionComment;
             TransactionValue = transactionValue;
-            PreviousHash = previousHash;
             CreatedAt = DateTime.UtcNow;
-            CurrentHash = ComputeThisHash();
+            CurrentHash = null;
         }
 
-        private string ComputeThisHash()
+        public void ComputeThisHash()
         {
+            if (Id > 1 && PreviousHash == null)
+            {
+                throw new ArgumentNullException(nameof(PreviousHash));
+            } 
             string text = $"{Id}{SellerId}{BuyerId}{TransactionComment}{TransactionValue}{PreviousHash}{CreatedAt}";
-            return MiscUtils.HashEncode(text);
+            CurrentHash = MiscUtils.HashEncode(text);
         }
     }
 }

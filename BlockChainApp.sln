@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic", "Logic\Logic.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dal", "Dal\Dal.csproj", "{52D85F3B-9B96-4A9A-B104-BC69FBB3C15B}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4038DE86-C191-4F8B-B88E-ABA65DB25D2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52D85F3B-9B96-4A9A-B104-BC69FBB3C15B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52D85F3B-9B96-4A9A-B104-BC69FBB3C15B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52D85F3B-9B96-4A9A-B104-BC69FBB3C15B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52D85F3B-9B96-4A9A-B104-BC69FBB3C15B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

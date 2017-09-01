@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Data.Entity.Validation;
-using System.Linq;
-using Dal.Dal;
+﻿using System.Linq;
 
 namespace Dal.Interfaces
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        IQueryable GetAll();
+        IQueryable<TEntity> GetAll();
 
         TEntity Find(long entityId);
 

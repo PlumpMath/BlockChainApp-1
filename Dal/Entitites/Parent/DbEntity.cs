@@ -6,7 +6,7 @@ namespace Dal.Entitites.Parent
 {
     public class DbEntity : IDbEntity
     {
-        [Key]
+        [Key, Column("id")]
         public long Id { get; set; }
     }
 }
