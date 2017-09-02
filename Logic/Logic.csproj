@@ -34,6 +34,7 @@
       <HintPath>..\packages\Autofac.4.6.1\lib\net45\Autofac.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,6 +49,7 @@
     <Compile Include="Entitites\ExchangeUserBase.cs" />
     <Compile Include="Entitites\User.cs" />
     <Compile Include="Entitites\Bank.cs" />
+    <Compile Include="Extensions\BankExtensions.cs" />
     <Compile Include="Fabric\UserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
     <Compile Include="Interfaces\IExchangeEventListener.cs" />

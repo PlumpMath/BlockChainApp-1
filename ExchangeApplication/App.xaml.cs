@@ -51,7 +51,7 @@ namespace ExchangeApplication
             for (var index = 0; index < users.Count; index++)
             {
                 IExchangeUser user = users[index];
-                bank.CreateAccount(user, index);
+                bank.CreateAccount(user);
             }
             users.Add((IExchangeUser)bank);
 

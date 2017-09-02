@@ -17,6 +17,7 @@ using ExchangeApplication.ViewModels;
 using ExchangeApplication.Views;
 using Logic.DependencyInjector;
 using Logic.Entitites;
+using Logic.Extensions;
 using Logic.Interfaces;
 using Logic.Storages;
 using Utilities.Common;
@@ -53,7 +54,7 @@ namespace ExchangeApplication
 
             _exchangeTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromSeconds(1)
+                Interval = TimeSpan.FromMilliseconds(200)
             };
             _exchangeTimer.Tick += _exchangeTimer_Tick;
         }
@@ -77,8 +78,11 @@ namespace ExchangeApplication
         private void FillData()
         {
             ListView_Users.Items.Clear();
-            IEnumerable<IExchangeUser> users = _exchange.GetExchangeUsers();
-            for (int i = users.Count() - 1; i >= 0; i--)
+            IEnumerable<IExchangeUser> users = _exchange
+                .GetExchangeUsers()
+                .OrderByDescending(u => u.GetBankAccountValue());
+
+            for (int i = 0; i < users.Count(); i++)
             {
                 IExchangeUser user = users.ElementAt(i);
                 var model = new ExchangeUserViewModel

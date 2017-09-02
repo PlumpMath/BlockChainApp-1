@@ -1,18 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Logic.Interfaces;
 using Utilities.Common;
+using Utilities.Convert;
 
 namespace Logic.Entitites
 {
     public class Bank : ExchangeUserBase, IBank
     {
-        private const double StartCapital = 21000000;
+        private static readonly double StartCapital 
+            = ConfigurationManager.AppSettings["StartCapital"].ParseAsDouble();
 
-        private const double BankComission = 0.01;
+        private static readonly double BankComission 
+            = ConfigurationManager.AppSettings["BankComission"].ParseAsDouble();
 
-        private const double DepositPercent = 0.05;
+        private static readonly double DepositPercent
+            = ConfigurationManager.AppSettings["DepositPercent"].ParseAsDouble();
+
+        private static readonly double MaximumByHands
+            = ConfigurationManager.AppSettings["MaximumByHands"].ParseAsDouble();
+
+        private static readonly double MinimumByHands
+            = ConfigurationManager.AppSettings["MinimumByHands"].ParseAsDouble();
 
         // Всеми деньгами считается собственный счет банка
         public double AllMoney
@@ -21,15 +32,12 @@ namespace Logic.Entitites
             set => GetAccountByUserId(this.Id).AccountValue = value;
         }
 
-        private const double MaximumByHands = 100000;
-
         private readonly List<BankAccount> _accounts;
 
         public Bank()
         {
             // Как будто самый старший игрок на рынке
             Id = 1000;
-
             // При создании открывается свой же собственный счет
             _accounts = new List<BankAccount>
             {
@@ -43,9 +51,9 @@ namespace Logic.Entitites
             Name = "Bank of Bitcoins";
         }
 
-        public double GetRandomMoney(int seed = 0)
+        public double GetRandomMoney()
         {
-            double amount = MiscUtils.GetRandomNumber(MaximumByHands, seed: seed);
+            double amount = MiscUtils.GetRandomNumber(MaximumByHands, MinimumByHands);
             AllMoney -= amount;
             return amount;
         }
@@ -99,11 +107,11 @@ namespace Logic.Entitites
             return result;
         }
 
-        public void CreateAccount(IExchangeUser user, int seed = 0)
+        public void CreateAccount(IExchangeUser user)
         {
             double money = user is Bank 
                 ? AllMoney 
-                : GetRandomMoney(seed);
+                : GetRandomMoney();
             _accounts.Add(new BankAccount
             {
                 UserId = user.Id,

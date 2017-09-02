@@ -4,7 +4,7 @@
     {
         double CalculateComission(double invoice);
 
-        void CreateAccount(IExchangeUser user, int seed = 0);
+        void CreateAccount(IExchangeUser user);
 
         double PayoutDepositPercent();
 

@@ -20,18 +20,22 @@ namespace Utilities.Common
             this IEnumerable<TEnumerableEntity> entities, int seed = 0)
         {
             int count = entities.Count();
-            return entities.ElementAt(GetRandomNumber(count - 1, seed: seed));
+            return entities.ElementAt(GetRandomNumber(count - 1));
         }
 
-        public static int GetRandomNumber(int max, int min = 0, int seed = 0)
+        private static int _randomSeed = 0;
+
+        public static int GetRandomNumber(int max, int min = 0)
         {
-            var rnd = new Random(DateTime.Now.Millisecond + seed);
+            var rnd = new Random(DateTime.Now.Millisecond + _randomSeed);
+            _randomSeed++;
             return rnd.Next(min, max);
         }
 
-        public static double GetRandomNumber(double max, double min = 0, int seed = 0)
+        public static double GetRandomNumber(double max, double min = 0)
         {
-            var rnd = new Random(DateTime.Now.Millisecond + seed);
+            var rnd = new Random(DateTime.Now.Millisecond + _randomSeed);
+            _randomSeed++;
             return rnd.NextDouble() * (max - min) + min;
         }
 
@@ -47,7 +51,7 @@ namespace Utilities.Common
 
         public static bool ContinueByRandom(int seed = 0)
         {
-            return GetRandomNumber(1, seed: seed) == 1;
+            return GetRandomNumber(1) == 1;
         } 
 
         private static readonly IEnumerable<string> _names = new string[]

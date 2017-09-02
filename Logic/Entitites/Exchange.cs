@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using Logic.Extensions;
 using Logic.Interfaces;
 using Logic.Storages;
 using Utilities.Common;
+using Utilities.Convert;
 
 namespace Logic.Entitites
 {
     public class Exchange : IExchange
     {
-        private const double MaxTransactionPrice = 5000;
+        private static readonly double MaxTransactionPrice
+            = ConfigurationManager.AppSettings["MaxTransactionPrice"].ParseAsDouble();
+
+        private static readonly double MaxTransactionDifferenceRate
+            = ConfigurationManager.AppSettings["MaxTransactionDifferenceRate"].ParseAsDouble();
 
         private readonly List<IExchangeUser> _exchangeUsers;
 
@@ -41,18 +48,27 @@ namespace Logic.Entitites
                 {
                     continue;
                 } 
-                IExchangeUser user = _exchangeUsers[index];
-                IExchangeUser contrAgent = GetContrAgent(user.Id);
-                double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice, seed: index);
+                IExchangeUser seller = _exchangeUsers[index];
+                IExchangeUser buyer = GetContrAgent(seller.Id);
 
-                if (!_bank.TransferMoney(user, contrAgent, invoice, out double comission))
+
+                double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
+                double buyerMoney = buyer.GetBankAccountValue();
+                double sellerMoney = seller.GetBankAccountValue();
+
+                if (buyerMoney > sellerMoney)
+                {
+                    //invoice = invoice + (buyerMoney - sellerMoney) * MaxTransactionDifferenceRate;
+                }
+
+                if (!_bank.TransferMoney(seller, buyer, invoice, out double comission))
                 {
                     continue;
                 }
 
                 Chain chain = new Chain(
-                    sellerId: user.Id,
-                    buyerId: contrAgent.Id,
+                    sellerId: seller.Id,
+                    buyerId: buyer.Id,
                     transactionValue: invoice,
                     transactionComission: comission);
 
