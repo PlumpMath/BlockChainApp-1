@@ -120,6 +120,7 @@ namespace ExchangeApplication
             ListView_BlockChain.Items.Add(new ChainViewModel(chain));
             ListView_BlockChain.SelectedIndex = ListView_BlockChain.Items.Count - 1;
             ListView_BlockChain.ScrollIntoView(ListView_BlockChain.SelectedItem);
+            // TODO Сделать сохранение в блокчейн
         }
 
         private void ListView_BlockChain_MouseDoubleClick(object sender, MouseButtonEventArgs e)
