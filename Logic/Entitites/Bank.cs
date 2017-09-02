@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using Logic.Exceptions;
 using Logic.Interfaces;
 using Utilities.Common;
 using Utilities.Convert;
@@ -51,6 +52,9 @@ namespace Logic.Entitites
             Name = "Bank of Bitcoins";
         }
 
+        /// <summary>
+        /// Возвращает рандомное кол-во денег для участника в разрешенном диапазоне 
+        /// </summary>
         public double GetRandomMoney()
         {
             double amount = MiscUtils.GetRandomNumber(MaximumByHands, MinimumByHands);
@@ -58,29 +62,28 @@ namespace Logic.Entitites
             return amount;
         }
 
+        /// <summary>
+        /// Возвращает общее количество денег в системе (у всех участников)
+        /// </summary>
+        /// <returns></returns>
         public double GetMoneyAmount()
         {
             return _accounts.Sum(account => account.AccountValue);
         }
 
+        /// <summary>
+        /// Возвращает кол-во денег у клиента. 
+        /// Внутри происходит исключение, если у клиента нет аккаунта в банке
+        /// </summary>
         public double GetAccountValue(long userId)
         {
             BankAccount account = GetAccountByUserId(userId);
             return account.AccountValue;
         }
 
-        public void PutMoneyToTheAccount(long userId, double value)
-        {
-            BankAccount account = GetAccountByUserId(userId);
-            account.AccountValue += value;
-        }
-
-        public void WithdrawMoney(long userId, double value)
-        {
-            BankAccount account = GetAccountByUserId(userId);
-            account.AccountValue -= value;
-        }
-
+        /// <summary>
+        /// Перечисление денег между продавцом и покупателем
+        /// </summary>
         public bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice, out double comission)
         {
             BankAccount buyerAccount = GetAccountByUserId(buyer.Id);
@@ -109,24 +112,37 @@ namespace Logic.Entitites
 
         public void CreateAccount(IExchangeUser user)
         {
-            double money = user is Bank 
-                ? AllMoney 
-                : GetRandomMoney();
+            if (user is Bank)
+            {
+                throw new ArgumentException("НГельзя создать счет у банка повторно");
+            }
             _accounts.Add(new BankAccount
             {
                 UserId = user.Id,
-                AccountValue = money
+                AccountValue = GetRandomMoney()
             });
         }
 
+        /// <summary>
+        /// Выплата процентов по депозитам
+        /// </summary>
         public double PayoutDepositPercent()
         {
             double allPercents = 0;
             foreach (BankAccount account in _accounts)
             {
                 double percent = account.AccountValue * DepositPercent;
-                if (account.UserId == this.Id 
-                    || AllMoney < percent) continue;
+                if (AllMoney < percent)
+                {
+                    // Случился дефолт системы
+                    throw new BankMoneyDefaultException();
+                }
+
+                if (account.UserId == this.Id)
+                {
+                    // Чтобы банк самому себе не платил процент
+                    continue;
+                }
 
                 allPercents += percent;
                 AllMoney -= percent;
@@ -138,8 +154,8 @@ namespace Logic.Entitites
         private BankAccount GetAccountByUserId(long userId)
         {
             var result = _accounts.SingleOrDefault(ac => ac.UserId == userId);
-            if (result == null) throw new NullReferenceException(nameof(result));
-            return result;
+            return result 
+                ?? throw new BankAccountDoesNotExistsException($"Отсутствует счет для Id = {userId}"); ;
         }
     }
 

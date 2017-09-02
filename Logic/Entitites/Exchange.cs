@@ -42,13 +42,14 @@ namespace Logic.Entitites
 
         public void ExecuteExchanging()
         {
-            for (var index = 0; index < _exchangeUsers.Count; index++)
+            foreach (IExchangeUser user in _exchangeUsers)
             {
-                if (MiscUtils.ContinueByRandom(index))
+                if (MiscUtils.ContinueByRandom())
                 {
+                    // Как бдуто участник просто не захотел торговаться на этот ход
                     continue;
                 } 
-                IExchangeUser seller = _exchangeUsers[index];
+                IExchangeUser seller = user;
                 IExchangeUser buyer = GetContrAgent(seller.Id);
 
 
@@ -77,6 +78,9 @@ namespace Logic.Entitites
             }
         }
 
+        /// <summary>
+        /// Выплата процентов по депозитам
+        /// </summary>
         public void PayoutDepositPercents()
         {
             double allPercents = _bank.PayoutDepositPercent();
@@ -84,7 +88,9 @@ namespace Logic.Entitites
             _exchangeEventListener?.CommonMessage(text);
         }
 
-
+        /// <summary>
+        /// Возвращает рандомного контр-агента, но при этом исключается сам участник
+        /// </summary>
         private IExchangeUser GetContrAgent(long excludeId)
         {
             return _exchangeUsers
@@ -92,6 +98,10 @@ namespace Logic.Entitites
                 .GetRandomEntity();
         }
 
+        /// <summary>
+        /// Сложно передавать в конструктор
+        /// </summary>
+        /// <param name="listener"></param>
         public void SetChainChangeListener(IExchangeEventListener listener)
         {
             _exchangeEventListener = listener;

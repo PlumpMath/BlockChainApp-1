@@ -6,9 +6,9 @@ namespace Logic.Fabric
 {
     public class UserFabric : IUserFactory
     {
-        public User GenerateEntity(int seed = 0)
+        public User GenerateEntity()
         {
-            return new User(MiscUtils.GetRandomName(seed));
+            return new User(MiscUtils.GetRandomName());
         }
     }
 

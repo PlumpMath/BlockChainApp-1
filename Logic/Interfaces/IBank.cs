@@ -12,10 +12,6 @@
 
         double GetAccountValue(long userId);
 
-        void PutMoneyToTheAccount(long userId, double value);
-
-        void WithdrawMoney(long userId, double value);
-
         bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice, out double comission);
     }
 }

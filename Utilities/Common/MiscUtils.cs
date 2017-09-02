@@ -44,12 +44,14 @@ namespace Utilities.Common
             return number.ToString(format);
         }
 
-        public static string GetRandomName(int seed = 0)
+        public static string GetRandomName()
         {
-            return _names.GetRandomEntity(seed);
+            var name = _names.GetRandomEntity(_randomSeed);
+            _randomSeed++;
+            return name;
         }
 
-        public static bool ContinueByRandom(int seed = 0)
+        public static bool ContinueByRandom()
         {
             return GetRandomNumber(1) == 1;
         } 

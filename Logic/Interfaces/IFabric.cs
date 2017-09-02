@@ -2,6 +2,6 @@
 {
     public interface IFabric<TEntity>
     {
-        TEntity GenerateEntity(int seed = 0);
+        TEntity GenerateEntity();
     }
 }

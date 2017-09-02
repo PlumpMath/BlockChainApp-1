@@ -29,18 +29,18 @@ namespace ExchangeApplication
             mainWindow.Show();
         }
 
-        private static void FillUsers()
+        private void FillUsers()
         {
             IUserFactory factory = DI.Get<IUserFactory>();
             IUserStorage storage = DI.Get<IUserStorage>();
             for (var i = 0; i < 10; i++)
             {
-                User user = factory.GenerateEntity(i);
+                User user = factory.GenerateEntity();
                 storage.Save(user);
             }
         }
 
-        private static IExchange CreateExchange()
+        private IExchange CreateExchange()
         {
             IBank bank = DI.Get<IBank>();
             IChainStorage chainStorage = DI.Get<IChainStorage>();
@@ -48,11 +48,11 @@ namespace ExchangeApplication
             var users = new List<IExchangeUser>();
             users.AddRange(DI.Get<IUserStorage>().GetAll());
 
-            for (var index = 0; index < users.Count; index++)
+            foreach (IExchangeUser user in users)
             {
-                IExchangeUser user = users[index];
                 bank.CreateAccount(user);
             }
+            // Банк как участник биржи
             users.Add((IExchangeUser)bank);
 
             var exchange = new Exchange(bank, chainStorage, users);

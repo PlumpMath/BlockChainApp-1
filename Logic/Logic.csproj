@@ -49,6 +49,7 @@
     <Compile Include="Entitites\ExchangeUserBase.cs" />
     <Compile Include="Entitites\User.cs" />
     <Compile Include="Entitites\Bank.cs" />
+    <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Extensions\BankExtensions.cs" />
     <Compile Include="Fabric\UserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
