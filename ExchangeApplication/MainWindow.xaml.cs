@@ -27,13 +27,15 @@ namespace ExchangeApplication
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IExchangeEventListener
+    public partial class MainWindow : Window, IObserver
     {
         private readonly IExchange _exchange;
 
         private readonly IBank _bank;
 
         private readonly IChainStorage _chainStorage;
+
+        private readonly ITransactionStorage _transactionStorage;
 
         private readonly DispatcherTimer _exchangeTimer;
 
@@ -47,7 +49,10 @@ namespace ExchangeApplication
             _exchange.SetChainChangeListener(this);
 
             _bank = DI.Get<IBank>();
+            _bank.SetChainChangeListener(this);
+
             _chainStorage = DI.Get<IChainStorage>();
+            _transactionStorage = DI.Get<ITransactionStorage>();
 
             InitializeComponent();
             FillData();
@@ -109,32 +114,52 @@ namespace ExchangeApplication
 
         public void CommonMessage(string message)
         {
-            TextBox_Log.Text += DateTime.Now.ToShortTimeString() + ") " 
-                + message + Environment.NewLine;
+            WriteToLog(message);
+        }
+
+        public void Transaction(Transaction transaction)
+        {
+            CreateNewChain(transaction);
+            ListView_Transactions.Items.Add(new TransactionViewModel(transaction));
+            ListView_Transactions.SelectedIndex = ListView_Transactions.Items.Count - 1;
+            ListView_Transactions.ScrollIntoView(ListView_Transactions.SelectedItem);
+        }
+
+        public void Exception(Exception exception)
+        {
+            WriteToLog("ОШИБКА! " + exception.Message);
+        }
+
+        private void WriteToLog(string text)
+        {
+            var time = DateTime.Now.ToShortTimeString();
+            TextBox_Log.Text += time + ") " + text + Environment.NewLine;
             TextBox_Log.ScrollToEnd();
             TextBox_Log.CaretIndex = TextBox_Log.Text.Length - 1;
         }
 
-        public void Transaction(Chain chain)
+        private void CreateNewChain(Transaction transaction)
         {
-            ListView_BlockChain.Items.Add(new ChainViewModel(chain));
-            ListView_BlockChain.SelectedIndex = ListView_BlockChain.Items.Count - 1;
-            ListView_BlockChain.ScrollIntoView(ListView_BlockChain.SelectedItem);
+            var chain = Chain.CreateFromTransaction(transaction);
+            _chainStorage.Save(chain);
         }
 
-        private void ListView_BlockChain_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListView_Transactions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var chainViewModel = ListView_BlockChain.SelectedItem as ChainViewModel;
-            if (chainViewModel == null)
+            var transactionViewModel = ListView_Transactions.SelectedItem as TransactionViewModel;
+            if (transactionViewModel == null)
             {
                 throw new InvalidCastException();
             }
+            // У чейна тот же айди, что и у транзакции
+            Chain chain = _chainStorage.GetEntity(transactionViewModel.Id);
 
             IUserStorage storage = DI.Get<IUserStorage>();
-            chainViewModel.SellerName = storage.GetEntity(chainViewModel.SellerId).Name;
-            chainViewModel.BuyerName = storage.GetEntity(chainViewModel.BuyerId).Name;
+            transactionViewModel.SellerName = storage.GetEntity(transactionViewModel.SellerId).Name;
+            transactionViewModel.BuyerName = storage.GetEntity(transactionViewModel.BuyerId).Name;
 
-            var chainView = new ChainView(chainViewModel);
+
+            var chainView = new ChainView(new ChainViewModel(chain));
             chainView.Show();
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using Autofac;
 using Logic.Entitites;
-using Logic.Fabric;
 using Logic.Storages;
 
 namespace Logic.DependencyInjector
@@ -14,21 +13,19 @@ namespace Logic.DependencyInjector
             var builder = new ContainerBuilder();
 
             // регистрируем споставление типов
-            builder.RegisterType<UserFabric>()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
             builder.RegisterType<ChainMemoryStorage>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
             builder.RegisterType<UserMemoryStorage>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<TransactionMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<Bank>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
             DI.SetContainer(builder.Build());

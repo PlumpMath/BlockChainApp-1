@@ -3,29 +3,13 @@ using Utilities.Common;
 
 namespace ExchangeApplication.ViewModels
 {
-    public class ChainViewModel
+    public class ChainViewModel : TransactionViewModel
     {
-        public long Id { get; set; }
-
-        public long SellerId { get; set; }
-
-        public string SellerName { get; set; }
-
-        public long BuyerId { get; set; }
-
-        public string BuyerName { get; set; }
-
-        public string TransactionComission { get; set; }
-
-        public string TransactionValue { get; set; }
-
         public string PreviousHash { get; set; }
 
         public string CurrentHash { get; set; }
 
-        public string CreatedAt { get; set; }
-
-        public ChainViewModel(Chain chain)
+        public ChainViewModel(Chain chain) : base()
         {
             Id = chain.Id;
             SellerId = chain.SellerId;

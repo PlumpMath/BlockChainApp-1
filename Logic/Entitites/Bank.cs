@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using Logic.DependencyInjector;
 using Logic.Exceptions;
+using Logic.Extensions;
 using Logic.Interfaces;
+using Logic.Storages;
 using Utilities.Common;
 using Utilities.Convert;
 
 namespace Logic.Entitites
 {
+    /// <summary>
+    /// Банк может вести себя и как участник торгов
+    /// </summary>
     public class Bank : ExchangeUserBase, IBank
     {
         private static readonly double StartCapital 
@@ -26,11 +32,15 @@ namespace Logic.Entitites
         private static readonly double MinimumByHands
             = ConfigurationManager.AppSettings["MinimumByHands"].ParseAsDouble();
 
+        private IObserver _observer;
+
+        private readonly ITransactionStorage _transactionStorage;
+
         // Всеми деньгами считается собственный счет банка
         public double AllMoney
         {
-            get => GetAccountByUserId(this.Id).AccountValue;
-            set => GetAccountByUserId(this.Id).AccountValue = value;
+            get => GetBankAccount(this.Id).AccountValue;
+            set => GetBankAccount(this.Id).AccountValue = value;
         }
 
         private readonly List<BankAccount> _accounts;
@@ -50,6 +60,7 @@ namespace Logic.Entitites
             };
 
             Name = "Bank of Bitcoins";
+            _transactionStorage = DI.Get<ITransactionStorage>();
         }
 
         /// <summary>
@@ -77,30 +88,38 @@ namespace Logic.Entitites
         /// </summary>
         public double GetAccountValue(long userId)
         {
-            BankAccount account = GetAccountByUserId(userId);
+            BankAccount account = GetBankAccount(userId);
             return account.AccountValue;
         }
 
-        /// <summary>
-        /// Перечисление денег между продавцом и покупателем
-        /// </summary>
-        public bool TransferMoney(IExchangeUser seller, IExchangeUser buyer, double invoice, out double comission)
+        public BankAccount GetBankAccount(long userId)
         {
-            BankAccount buyerAccount = GetAccountByUserId(buyer.Id);
-            // Если нет денег
-            if (buyerAccount.AccountValue < invoice)
+            return _accounts.SingleOrDefault(ac => ac.UserId == userId)
+                   ?? throw new BankAccountDoesNotExistsException($"Отсутствует счет для Id = {userId}");
+        }
+
+        /// <summary>
+        /// Перечисление денег между продавцом и покупателем. 
+        /// Возвращает флаг, произошла ли сделка
+        /// </summary>
+        public void TransferMoney(IExchangeUser agent, IExchangeUser contrAgent, double value)
+        {
+            BankAccount buyerAccount = contrAgent.GetBankAccount();
+
+
+            if (buyerAccount.AccountValue < value)
             {
-                comission = 0;
-                return false;
+                // Если нет денег, то сделка не удалась
+                return;
             }
 
-            BankAccount sellerAccount = GetAccountByUserId(seller.Id);
-            comission = CalculateComission(invoice);
+            BankAccount sellerAccount = agent.GetBankAccount();
+            double comission = CalculateComission(value);
 
-            sellerAccount.AccountValue += invoice - comission;
-            buyerAccount.AccountValue -= invoice;
+            sellerAccount.AccountValue += value - comission;
+            buyerAccount.AccountValue -= value;
 
-            return true;
+            CreateTransaction(agent.Id, contrAgent.Id, value, comission);
         }
 
         public double CalculateComission(double invoice)
@@ -114,7 +133,7 @@ namespace Logic.Entitites
         {
             if (user is Bank)
             {
-                throw new ArgumentException("НГельзя создать счет у банка повторно");
+                throw new ArgumentException("Нельзя создать счет у банка повторно");
             }
             _accounts.Add(new BankAccount
             {
@@ -147,22 +166,23 @@ namespace Logic.Entitites
                 allPercents += percent;
                 AllMoney -= percent;
                 account.AccountValue += percent;
+
+                // Должно быть оформление в виде транзакции
+                CreateTransaction(this.Id, account.UserId, percent, 0);
             }
             return allPercents;
         }
 
-        private BankAccount GetAccountByUserId(long userId)
+        public void SetChainChangeListener(IObserver listener)
         {
-            var result = _accounts.SingleOrDefault(ac => ac.UserId == userId);
-            return result 
-                ?? throw new BankAccountDoesNotExistsException($"Отсутствует счет для Id = {userId}"); ;
+            _observer = listener;
         }
-    }
 
-    internal class BankAccount
-    {
-        public long UserId { get; set; }
-
-        public double AccountValue { get; set; }
+        private void CreateTransaction(long sellerId, long buyerId, double invoice, double comission)
+        {
+            var transaction = new Transaction(sellerId, buyerId, invoice, comission);
+            _transactionStorage.Save(transaction);
+            _observer?.Transaction(transaction);
+        }
     }
 }

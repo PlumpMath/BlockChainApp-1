@@ -16,12 +16,4 @@ namespace Logic.Exceptions
 
         public BankAccountDoesNotExistsException(string message) : base(message) { }
     }
-
-    /// <summary>
-    /// Сигнализирует, что пользователь обанкротился. 
-    /// </summary>
-    public class ExchangeUserDefaultException : Exception
-    {
-        public ExchangeUserDefaultException(string message) : base(message) { }
-    }
 }

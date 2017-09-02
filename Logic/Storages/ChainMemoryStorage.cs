@@ -12,8 +12,8 @@ namespace Logic.Storages
             {
                 Chain lastChain = GetLastEntity();
                 entity.PreviousHash = lastChain.CurrentHash;
-                entity.ComputeThisHash();
             }
+            entity.ComputeThisHash();
             base.Save(entity);
         }
     }

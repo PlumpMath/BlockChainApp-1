@@ -18,24 +18,23 @@ namespace Logic.Entitites
         private static readonly double MaxTransactionDifferenceRate
             = ConfigurationManager.AppSettings["MaxTransactionDifferenceRate"].ParseAsDouble();
 
+        /// <summary>
+        /// Список участников
+        /// </summary>
         private readonly List<IExchangeUser> _exchangeUsers;
 
+        /// <summary>
+        /// Управляющий транзакциями банк
+        /// </summary>
         private readonly IBank _bank;
 
-        private readonly IChainStorage _chainStorage;
+        private IObserver _observer;
 
-        private IExchangeEventListener _exchangeEventListener;
-
-        public Exchange(IBank bank, IChainStorage chainStorage, IEnumerable<IExchangeUser> users)
+        public Exchange(IBank bank, IEnumerable<IExchangeUser> users)
         {
             _bank = bank;
-            _chainStorage = chainStorage;
             _exchangeUsers = new List<IExchangeUser>();
-
-            foreach (IExchangeUser user in users)
-            {
-                _exchangeUsers.Add(user);
-            }
+            _exchangeUsers.AddRange(users);
         }
 
         public IEnumerable<IExchangeUser> GetExchangeUsers() => _exchangeUsers;
@@ -44,37 +43,18 @@ namespace Logic.Entitites
         {
             foreach (IExchangeUser user in _exchangeUsers)
             {
-                if (MiscUtils.ContinueByRandom())
+                if (user.WannaMissTurn())
                 {
-                    // Как бдуто участник просто не захотел торговаться на этот ход
+                    // участник просто не захотел торговаться на этот ход
                     continue;
                 } 
                 IExchangeUser seller = user;
                 IExchangeUser buyer = GetContrAgent(seller.Id);
 
-
+                // Кол-во денег вычисляется рандомно
                 double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
-                double buyerMoney = buyer.GetBankAccountValue();
-                double sellerMoney = seller.GetBankAccountValue();
 
-                if (buyerMoney > sellerMoney)
-                {
-                    //invoice = invoice + (buyerMoney - sellerMoney) * MaxTransactionDifferenceRate;
-                }
-
-                if (!_bank.TransferMoney(seller, buyer, invoice, out double comission))
-                {
-                    continue;
-                }
-
-                Chain chain = new Chain(
-                    sellerId: seller.Id,
-                    buyerId: buyer.Id,
-                    transactionValue: invoice,
-                    transactionComission: comission);
-
-                _chainStorage.Save(chain);
-                _exchangeEventListener?.Transaction(chain);
+                _bank.TransferMoney(seller, buyer, invoice);
             }
         }
 
@@ -85,7 +65,7 @@ namespace Logic.Entitites
         {
             double allPercents = _bank.PayoutDepositPercent();
             var text = $"Выплачены проценты по депозитам {MiscUtils.FormatDouble(allPercents)}";
-            _exchangeEventListener?.CommonMessage(text);
+            _observer?.CommonMessage(text);
         }
 
         /// <summary>
@@ -101,10 +81,9 @@ namespace Logic.Entitites
         /// <summary>
         /// Сложно передавать в конструктор
         /// </summary>
-        /// <param name="listener"></param>
-        public void SetChainChangeListener(IExchangeEventListener listener)
+        public void SetChainChangeListener(IObserver listener)
         {
-            _exchangeEventListener = listener;
+            _observer = listener;
         }
     }
 }

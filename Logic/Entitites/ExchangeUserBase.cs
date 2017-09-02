@@ -1,10 +1,11 @@
 ﻿using System;
 using Logic.DependencyInjector;
 using Logic.Interfaces;
+using Utilities.Common;
 
 namespace Logic.Entitites
 {
-    public class ExchangeUserBase : IExchangeUser
+    public abstract class ExchangeUserBase : IExchangeUser
     {
         public long Id { get; set; }
 
@@ -12,7 +13,15 @@ namespace Logic.Entitites
 
         public string Name { get; set; }
 
-        public ExchangeUserBase()
+        /// <summary>
+        /// Участник может не захотеть вести торги на этот раз
+        /// </summary>
+        public virtual bool WannaMissTurn()
+        {
+            return MiscUtils.ContinueByRandom();
+        }
+
+        protected ExchangeUserBase()
         {
             Id = 0;
             CreatedAt = DateTime.UtcNow;
