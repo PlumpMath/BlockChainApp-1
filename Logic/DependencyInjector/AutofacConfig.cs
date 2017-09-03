@@ -28,7 +28,7 @@ namespace Logic.DependencyInjector
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<Bank>()
+            builder.RegisterType<Bank.Bank>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 

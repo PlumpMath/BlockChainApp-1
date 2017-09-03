@@ -51,7 +51,7 @@ namespace ExchangeApplication
                 bank.CreateAccount(exchangeUser);
             }
             // Банк как участник биржи
-            exchangeUsers.Add((IExchangeUser)bank);
+            exchangeUsers.Add(bank.GetExchangeUser());
 
             var exchange = new Exchange(bank, exchangeUsers);
             return exchange;

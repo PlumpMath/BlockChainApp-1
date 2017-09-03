@@ -44,13 +44,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bank\BankExchangeUser.cs" />
     <Compile Include="DependencyInjector\AutofacConfig.cs" />
-    <Compile Include="Entitites\BankAccount.cs" />
+    <Compile Include="Bank\BankAccount.cs" />
     <Compile Include="Entitites\Exchange.cs" />
     <Compile Include="Entitites\ExchangeUserBase.cs" />
     <Compile Include="Entitites\Transaction.cs" />
     <Compile Include="Entitites\User.cs" />
-    <Compile Include="Entitites\Bank.cs" />
+    <Compile Include="Bank\Bank.cs" />
     <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Exceptions\ExchangeUserDefaultException.cs" />
     <Compile Include="Extensions\BankExtensions.cs" />

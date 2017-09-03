@@ -43,5 +43,7 @@ namespace Logic.Interfaces
         /// Осуществление перевода денег
         /// </summary>
         void TransferMoney(IExchangeUser agent, IExchangeUser contrAgent, double value);
+
+        IExchangeUser GetExchangeUser();
     }
 }

@@ -19,23 +19,26 @@ namespace Utilities.Common
         public static TEnumerableEntity GetRandomEntity<TEnumerableEntity>(this IEnumerable<TEnumerableEntity> entities)
         {
             int count = entities.Count();
-            return entities.ElementAt(GetRandomNumber(count - 1));
+            int index = GetRandomNumber(count);
+            return entities.ElementAt(index);
         }
 
-        private static int _randomSeed = 0;
+        private static int _randomSeed = -1;
 
         public static int GetRandomNumber(int max, int min = 0)
         {
-            var rnd = new Random(DateTime.Now.Millisecond + _randomSeed);
-            _randomSeed++;
-            return rnd.Next(min, max);
+            return GetRandom().Next(min, max);
         }
 
         public static double GetRandomNumber(double max, double min = 0)
         {
-            var rnd = new Random(DateTime.Now.Millisecond + _randomSeed);
+            return GetRandom().NextDouble() * (max - min) + min;
+        }
+
+        private static Random GetRandom()
+        {
             _randomSeed++;
-            return rnd.NextDouble() * (max - min) + min;
+            return new Random(DateTime.Now.Millisecond + _randomSeed);
         }
 
         public static string FormatDouble(double number, string format = "0.##")

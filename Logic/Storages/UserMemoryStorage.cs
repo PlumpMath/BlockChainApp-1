@@ -11,7 +11,7 @@ namespace Logic.Storages
             if (id == long.MaxValue)
             {
                 // под максимальным id "прячется" банк
-                return (ExchangeUserBase) DI.Get<IBank>();
+                return (ExchangeUserBase) DI.Get<IBank>().GetExchangeUser();
             }
             return base.GetEntity(id);
         }

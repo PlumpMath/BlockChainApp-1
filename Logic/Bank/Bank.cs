@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Logic.DependencyInjector;
+using Logic.Entitites;
 using Logic.Exceptions;
 using Logic.Extensions;
 using Logic.Interfaces;
@@ -10,12 +11,12 @@ using Logic.Storages;
 using Utilities.Common;
 using Utilities.Convert;
 
-namespace Logic.Entitites
+namespace Logic.Bank
 {
     /// <summary>
     /// Банк может вести себя и как участник торгов
     /// </summary>
-    public class Bank : ExchangeUserBase, IBank
+    public class Bank : IBank
     {
         private static readonly double StartCapital 
             = ConfigurationManager.AppSettings["StartCapital"].ParseAsDouble();
@@ -36,30 +37,37 @@ namespace Logic.Entitites
 
         private readonly ITransactionStorage _transactionStorage;
 
+        private readonly IExchangeUser _bankExchangeUser;
+
         // Всеми деньгами считается собственный счет банка
         public double AllMoney
         {
-            get => GetBankAccount(this.Id).AccountValue;
-            set => GetBankAccount(this.Id).AccountValue = value;
+            get => GetBankAccount(_bankExchangeUser.Id).AccountValue;
+            set => GetBankAccount(_bankExchangeUser.Id).AccountValue = value;
         }
 
         private readonly List<BankAccount> _accounts;
 
         public Bank()
         {
-            // Как будто самый старший игрок на рынке
-            Id = long.MaxValue;
+            
+            _bankExchangeUser = new BankExchangeUser
+            {
+                Name = "Bank of Bitcoins",
+                Id = long.MaxValue
+            };
+
             // При создании открывается свой же собственный счет
             _accounts = new List<BankAccount>
             {
                 new BankAccount
                 {
-                    UserId = this.Id,
+                    UserId = _bankExchangeUser.Id,
                     AccountValue = StartCapital
                 }
             };
 
-            Name = "Bank of Bitcoins";
+            
             _transactionStorage = DI.Get<ITransactionStorage>();
         }
 
@@ -88,8 +96,7 @@ namespace Logic.Entitites
         /// </summary>
         public double GetAccountValue(long userId)
         {
-            BankAccount account = GetBankAccount(userId);
-            return account.AccountValue;
+            return GetBankAccount(userId).AccountValue;
         }
 
         public BankAccount GetBankAccount(long userId)
@@ -122,6 +129,8 @@ namespace Logic.Entitites
             CreateTransaction(agent.Id, contrAgent.Id, value, comission);
         }
 
+        public IExchangeUser GetExchangeUser() => _bankExchangeUser;
+
         public double CalculateComission(double invoice)
         {
             var result = invoice * BankComission;
@@ -131,7 +140,7 @@ namespace Logic.Entitites
 
         public void CreateAccount(IExchangeUser user)
         {
-            if (user is Bank)
+            if (user is BankExchangeUser)
             {
                 throw new ArgumentException("Нельзя создать счет у банка повторно");
             }
@@ -157,7 +166,7 @@ namespace Logic.Entitites
                     throw new BankMoneyDefaultException();
                 }
 
-                if (account.UserId == this.Id)
+                if (account.UserId == _bankExchangeUser.Id)
                 {
                     // Чтобы банк самому себе не платил процент
                     continue;
@@ -168,7 +177,7 @@ namespace Logic.Entitites
                 account.AccountValue += percent;
 
                 // Должно быть оформление в виде транзакции
-                CreateTransaction(this.Id, account.UserId, percent, 0);
+                CreateTransaction(_bankExchangeUser.Id, account.UserId, percent, 0);
             }
             return allPercents;
         }

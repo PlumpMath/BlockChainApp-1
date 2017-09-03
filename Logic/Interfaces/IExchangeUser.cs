@@ -8,7 +8,7 @@
         /// <summary>
         /// Имя участника
         /// </summary>
-        string Name { get; }
+        string Name { get; set; }
 
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
