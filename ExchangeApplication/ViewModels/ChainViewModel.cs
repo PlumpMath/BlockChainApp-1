@@ -1,5 +1,6 @@
 ﻿using Logic.DependencyInjector;
 using Logic.Entitites;
+using Logic.Finance;
 using Logic.Storages;
 using Utilities.Common;
 
@@ -17,7 +18,7 @@ namespace ExchangeApplication.ViewModels
             SellerId = chain.SellerId;
             BuyerId = chain.BuyerId;
 
-            IExchangeUserStorage storage = DI.Get<IExchangeUserStorage>();
+            IExchangeUserStorage storage = Injector.Get<IExchangeUserStorage>();
             var sellerName = storage.GetEntity(SellerId).Name;
             var buyerName = storage.GetEntity(BuyerId).Name;
             SellerName = sellerName;

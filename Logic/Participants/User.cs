@@ -1,7 +1,4 @@
-﻿using System;
-using Logic.Interfaces;
-
-namespace Logic.Entitites
+﻿namespace Logic.Participants
 {
     public class User : ExchangeUserBase
     {

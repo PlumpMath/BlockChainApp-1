@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Logic.Interfaces
+namespace Logic.Participants
 {
     /// <summary>
     /// Объект, который может быть идентифицируем

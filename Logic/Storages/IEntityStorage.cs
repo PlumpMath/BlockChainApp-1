@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Logic.Entitites;
+using Logic.Participants;
 
 namespace Logic.Interfaces
 {

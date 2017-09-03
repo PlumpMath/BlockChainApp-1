@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Logic.Observation;
+using Logic.Participants;
 using Logic.Storages;
 
 namespace Logic.Interfaces

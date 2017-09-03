@@ -1,7 +1,8 @@
 ﻿using System;
 using Logic.Entitites;
+using Logic.Finance;
 
-namespace Logic.Interfaces
+namespace Logic.Observation
 {
     public interface IObserver
     {

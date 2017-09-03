@@ -1,7 +1,8 @@
 ﻿using System;
 using Logic.Interfaces;
+using Logic.Participants;
 
-namespace Logic.Entitites
+namespace Logic.Finance
 {
     public class Transaction : IIdentificable
     {

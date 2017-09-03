@@ -1,5 +1,6 @@
 ﻿using System;
 using Logic.Interfaces;
+using Logic.Participants;
 
 namespace Logic.Exceptions
 {

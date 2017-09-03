@@ -1,9 +1,8 @@
 ﻿using System;
-using Logic.DependencyInjector;
 using Logic.Interfaces;
 using Utilities.Common;
 
-namespace Logic.Entitites
+namespace Logic.Participants
 {
     public abstract class ExchangeUserBase : IExchangeUser
     {

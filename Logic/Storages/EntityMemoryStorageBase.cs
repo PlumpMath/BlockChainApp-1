@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Logic.Entitites;
 using Logic.Interfaces;
+using Logic.Participants;
 
 namespace Logic.Storages
 {

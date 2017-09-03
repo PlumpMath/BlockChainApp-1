@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using Logic.Extensions;
+using Logic.Bank;
 using Logic.Interfaces;
-using Logic.Storages;
+using Logic.Observation;
+using Logic.Participants;
 using Utilities.Common;
 using Utilities.Convert;
 
-namespace Logic.Entitites
+namespace Logic.Finance
 {
     public class Exchange : IExchange
     {

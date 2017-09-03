@@ -5,10 +5,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Logic.Bank;
 using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Fabrics;
+using Logic.Finance;
 using Logic.Interfaces;
+using Logic.Participants;
 using Logic.Storages;
 using Utilities.Common;
 
@@ -34,14 +37,14 @@ namespace ExchangeApplication
 
         private IEnumerable<User> CreateUsers()
         {
-            IEnumerable<User> users = DI.Get<IUserFabric>().GetEntities(10);
-            DI.Get<IExchangeUserStorage>().Save(users);
+            IEnumerable<User> users = Injector.Get<IUserFabric>().GetEntities(10);
+            Injector.Get<IExchangeUserStorage>().Save(users);
             return users;
         }
 
         private IExchange CreateExchange(IEnumerable<User> users)
         {
-            IBank bank = DI.Get<IBank>();
+            IBank bank = Injector.Get<IBank>();
 
             var exchangeUsers = new List<IExchangeUser>();
             exchangeUsers.AddRange(users);

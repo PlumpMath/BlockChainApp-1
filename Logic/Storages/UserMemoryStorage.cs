@@ -1,6 +1,8 @@
-﻿using Logic.DependencyInjector;
+﻿using Logic.Bank;
+using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Interfaces;
+using Logic.Participants;
 
 namespace Logic.Storages
 {
@@ -11,7 +13,7 @@ namespace Logic.Storages
             if (id == long.MaxValue)
             {
                 // под максимальным id "прячется" банк
-                return (ExchangeUserBase) DI.Get<IBank>().GetExchangeUser();
+                return (ExchangeUserBase) Injector.Get<IBank>().GetExchangeUser();
             }
             return base.GetEntity(id);
         }

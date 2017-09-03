@@ -1,5 +1,4 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using Logic.Entitites;
 using Logic.Fabrics;
 using Logic.Storages;
@@ -33,34 +32,7 @@ namespace Logic.DependencyInjector
                 .InstancePerLifetimeScope();
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
-            DI.SetContainer(builder.Build());
+            Injector.SetContainer(builder.Build());
         }
     }
-
-    #region DependencyInjection
-
-    public static class DI
-    {
-        private static IContainer _container;
-
-        public static void SetContainer(IContainer container)
-        {
-            if (_container != null)
-            {
-                throw new ArgumentException(nameof(container));
-            }
-            _container = container;
-        }
-
-        public static TInterface Get<TInterface>()
-        {
-            if (_container == null)
-            {
-                throw new NullReferenceException(nameof(_container));
-            }
-            return _container.Resolve<TInterface>();
-        }
-    }
-
-    #endregion
 }

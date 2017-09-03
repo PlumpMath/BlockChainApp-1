@@ -1,8 +1,8 @@
 ﻿using System;
-using Logic.Interfaces;
+using Logic.Entitites;
 using Utilities.Common;
 
-namespace Logic.Entitites
+namespace Logic.Finance
 {
     public class Chain :  Transaction
     {

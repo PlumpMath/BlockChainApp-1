@@ -1,4 +1,4 @@
-﻿namespace Logic.Interfaces
+﻿namespace Logic.Observation
 {
     public interface IObserverable
     {

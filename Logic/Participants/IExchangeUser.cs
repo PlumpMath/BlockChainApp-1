@@ -1,4 +1,6 @@
-﻿namespace Logic.Interfaces
+﻿using Logic.Interfaces;
+
+namespace Logic.Participants
 {
     /// <summary>
     /// Участник биржи и торгов

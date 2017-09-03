@@ -6,7 +6,10 @@ using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Exceptions;
 using Logic.Extensions;
+using Logic.Finance;
 using Logic.Interfaces;
+using Logic.Observation;
+using Logic.Participants;
 using Logic.Storages;
 using Utilities.Common;
 using Utilities.Convert;
@@ -68,7 +71,7 @@ namespace Logic.Bank
             };
 
             
-            _transactionStorage = DI.Get<ITransactionStorage>();
+            _transactionStorage = Injector.Get<ITransactionStorage>();
         }
 
         /// <summary>

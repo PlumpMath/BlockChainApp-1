@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Logic.Entitites;
+using Logic.Finance;
 using Logic.Interfaces;
 
 namespace Logic.Storages

@@ -1,6 +1,9 @@
 ﻿using Logic.Entitites;
+using Logic.Interfaces;
+using Logic.Observation;
+using Logic.Participants;
 
-namespace Logic.Interfaces
+namespace Logic.Bank
 {
     /// <summary>
     /// Банк, осуществляющий операции

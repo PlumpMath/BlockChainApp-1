@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Logic.Entitites;
+using Logic.Participants;
 using Utilities.Common;
 
 namespace Logic.Fabrics

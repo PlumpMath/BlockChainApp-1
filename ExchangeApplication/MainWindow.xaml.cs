@@ -15,10 +15,14 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using ExchangeApplication.ViewModels;
 using ExchangeApplication.Views;
+using Logic.Bank;
 using Logic.DependencyInjector;
 using Logic.Entitites;
 using Logic.Extensions;
+using Logic.Finance;
 using Logic.Interfaces;
+using Logic.Observation;
+using Logic.Participants;
 using Logic.Storages;
 using Utilities.Common;
 
@@ -48,11 +52,11 @@ namespace ExchangeApplication
             _exchange = exchange;
             _exchange.SetChainChangeListener(this);
 
-            _bank = DI.Get<IBank>();
+            _bank = Injector.Get<IBank>();
             _bank.SetChainChangeListener(this);
 
-            _chainStorage = DI.Get<IChainStorage>();
-            _transactionStorage = DI.Get<ITransactionStorage>();
+            _chainStorage = Injector.Get<IChainStorage>();
+            _transactionStorage = Injector.Get<ITransactionStorage>();
 
             InitializeComponent();
             FillData();
@@ -98,7 +102,7 @@ namespace ExchangeApplication
                 ListView_Users.Items.Add(model);
             }
             //---------------------
-            TextBlock_BankMoney.Text = MiscUtils.FormatDouble(DI.Get<IBank>().GetMoneyAmount());
+            TextBlock_BankMoney.Text = MiscUtils.FormatDouble(Injector.Get<IBank>().GetMoneyAmount());
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
