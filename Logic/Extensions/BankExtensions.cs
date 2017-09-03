@@ -1,7 +1,6 @@
 ﻿using Logic.Bank;
 using Logic.DependencyInjector;
 using Logic.Interfaces;
-using Logic.Participants;
 
 namespace Logic.Extensions
 {
@@ -9,12 +8,17 @@ namespace Logic.Extensions
     {
         public static double GetBankAccountValue(this IExchangeUser user)
         {
-            return Injector.Get<IBank>().GetAccountValue(user.UniqueExchangeId());
+            return GetBankAccount(user).AccountValue;
         }
 
         public static BankAccount GetBankAccount(this IExchangeUser user)
         {
             return Injector.Get<IBank>().GetBankAccount(user.UniqueExchangeId());
+        }
+
+        public static IExchangeUser GetOwnerByBankAccount(this BankAccount account)
+        {
+            return Injector.Get<IBank>().GetOwnerByBankAccount(account.UniqueUserId);
         }
     }
 }

@@ -47,7 +47,7 @@
             <ListView x:Name="ListView_Transactions" Margin="10,41,10,10" Grid.Row="1" MouseDoubleClick="ListView_Transactions_MouseDoubleClick">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Получатель">
+                        <GridViewColumn Header="Отправитель">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding SenderName}" HorizontalAlignment="Stretch" />
@@ -55,7 +55,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Отправитель">
+                        <GridViewColumn Header="Получатель">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ReceiverName}" HorizontalAlignment="Stretch" />

@@ -33,11 +33,11 @@ namespace ExchangeApplication.ViewModels
             ReceiverUniqueId = transaction.ReceiverUniqueId;
 
             IExchangeUserStorage storage = Injector.Get<IExchangeUserStorage>();
-            var sellerName = storage.GetEntity(SenderUniqueId).Name;
-            var buyerName = storage.GetEntity(ReceiverUniqueId).Name;
+            var senderName = storage.GetEntity(SenderUniqueId).Name;
+            var receiverName = storage.GetEntity(ReceiverUniqueId).Name;
 
-            SenderName = sellerName;
-            ReceiverName = buyerName;
+            SenderName = senderName;
+            ReceiverName = receiverName;
             TransactionComission = MiscUtils.FormatDouble(transaction.TransactionComission);
             TransactionValue = MiscUtils.FormatDouble(transaction.TransactionValue);
             CreatedAt = transaction.CreatedAt.ToLongDateString();

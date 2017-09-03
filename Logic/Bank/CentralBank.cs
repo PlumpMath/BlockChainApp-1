@@ -31,8 +31,11 @@ namespace Logic.Bank
         private static readonly double BankComissionForCompanies
             = ConfigurationManager.AppSettings["BankComissionForCompanies"].ParseAsDouble();
 
-        private static readonly double DepositPercent
-            = ConfigurationManager.AppSettings["DepositPercent"].ParseAsDouble();
+        private static readonly double DepositPercentIndividual
+            = ConfigurationManager.AppSettings["DepositPercentIndividual"].ParseAsDouble();
+
+        private static readonly double DepositPercentCompanies
+            = ConfigurationManager.AppSettings["DepositPercentCompanies"].ParseAsDouble();
 
         private static readonly double MaximumByHandsIndividual
             = ConfigurationManager.AppSettings["MaximumByHandsIndividual"].ParseAsDouble();
@@ -73,7 +76,9 @@ namespace Logic.Bank
                 new BankAccount
                 {
                     UniqueUserId = _bankExchangeUser.UniqueExchangeId(),
-                    AccountValue = StartCapital
+                    AccountValue = StartCapital,
+                    DepositPercent = 0,
+                    TransactionComissionRate = 0
                 }
             };
         }
@@ -83,10 +88,11 @@ namespace Logic.Bank
         /// </summary>
         public double GetRandomMoney(IExchangeUser user)
         {
-            double max = user is Company
+            bool isCompany = user.ExchangeUserType == ExchangeUserType.Company;
+            double max = isCompany
                 ? MaximumByHandsCompany
                 : MaximumByHandsIndividual;
-            double min = user is Company
+            double min = isCompany
                 ? MinimumByHandsCompany
                 : MinimumByHandsIndividual;
 
@@ -119,16 +125,22 @@ namespace Logic.Bank
                    ?? throw new BankAccountDoesNotExistsException($"Отсутствует счет для UniqueUserId = {uniqueUserId}");
         }
 
+        public IExchangeUser GetOwnerByBankAccount(string accountUniqueId)
+        {
+            var account = GetBankAccount(accountUniqueId);
+            return account.ExchangeUser;
+        }
+
         /// <summary>
         /// Перечисление денег между продавцом и покупателем. 
         /// Возвращает флаг, произошла ли сделка
         /// </summary>
-        public void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double value)
+        public void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice)
         {
             BankAccount senderAccount = sender.GetBankAccount();
 
 
-            if (senderAccount.AccountValue < value)
+            if (senderAccount.AccountValue < invoice)
             {
                 // Если нет денег, то сделка не удалась
                 return;
@@ -136,41 +148,23 @@ namespace Logic.Bank
 
             BankAccount receiverAccount = receiver.GetBankAccount();
             
-            double comission = CalculateComission(value, sender);
+            double comissionRate = senderAccount.TransactionComissionRate;
+            double comission = invoice * comissionRate;
 
-            receiverAccount.AccountValue += value;
-            senderAccount.AccountValue -= value + comission;
+            // Перечисление комиссии в счет банка
+            AllMoney += comission;
 
-            CreateTransaction(receiver.UniqueExchangeId(), sender.UniqueExchangeId(), value, comission);
+            receiverAccount.AccountValue += invoice;
+            senderAccount.AccountValue -= invoice + comission;
+
+            CreateTransaction(sender, receiver, invoice, comission);
         }
 
         public IExchangeUser GetExchangeUser() => _bankExchangeUser;
 
-        private double CalculateComission(double invoice, IExchangeUser sender)
-        {
-            double comissionRate;
-            switch (sender.ExchangeUserType)
-            {
-                case ExchangeUserType.Individual:
-                    comissionRate = BankComissionForIndividual;
-                    break;
-                case ExchangeUserType.Company:
-                    comissionRate = BankComissionForCompanies;
-                    break;
-                case ExchangeUserType.CentralBank:
-                    comissionRate = 0;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            var result = invoice * comissionRate;
-            AllMoney += result;
-            return result;
-        }
-
         public void CreateAccount(IExchangeUser user)
         {
-            if (user is BankExchangeUser)
+            if (user.ExchangeUserType == ExchangeUserType.CentralBank)
             {
                 throw new ArgumentException("Нельзя создать счет у банка повторно");
             }
@@ -178,7 +172,9 @@ namespace Logic.Bank
             {
                 UniqueUserId = user.UniqueExchangeId(),
                 AccountValue = GetRandomMoney(user),
-                ExchangeUser = user
+                ExchangeUser = user,
+                DepositPercent = DefineDepositPercentRateBasedOnUser(user),
+                TransactionComissionRate = DefineTransactionComissionRateBasedOnUser(user)
             });
         }
 
@@ -190,7 +186,7 @@ namespace Logic.Bank
             double allPercents = 0;
             foreach (BankAccount account in _accounts)
             {
-                double percent = account.AccountValue * DepositPercent;
+                double percent = account.AccountValue * account.DepositPercent;
                 if (AllMoney < percent)
                 {
                     // Случился дефолт системы
@@ -208,7 +204,7 @@ namespace Logic.Bank
                 account.AccountValue += percent;
 
                 // Должно быть оформление в виде транзакции
-                CreateTransaction(account.UniqueUserId, _bankExchangeUser.UniqueExchangeId(), percent, 0);
+                CreateTransaction(_bankExchangeUser, account.GetOwnerByBankAccount(), percent, 0);
             }
             return allPercents;
         }
@@ -218,11 +214,54 @@ namespace Logic.Bank
             _observer = listener;
         }
 
-        private void CreateTransaction(string senderUniqueId, string receiverUniqueId, double invoice, double comission)
+        private void CreateTransaction(IExchangeUser sender, IExchangeUser receiver, double invoice, double comission)
         {
+            string senderUniqueId = sender.UniqueExchangeId();
+            string receiverUniqueId = receiver.UniqueExchangeId();
+
             var transaction = new Transaction(senderUniqueId, receiverUniqueId, invoice, comission);
             Injector.Get<ITransactionStorage>().Save(transaction);
             _observer?.Transaction(transaction);
+        }
+
+        private double DefineTransactionComissionRateBasedOnUser(IExchangeUser user)
+        {
+            double rate;
+            switch (user.ExchangeUserType)
+            {
+                case ExchangeUserType.Individual:
+                    rate = BankComissionForIndividual;
+                    break;
+                case ExchangeUserType.Company:
+                    rate = BankComissionForCompanies;
+                    break;
+                case ExchangeUserType.CentralBank:
+                    rate = 0;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return rate;
+        }
+
+        private double DefineDepositPercentRateBasedOnUser(IExchangeUser user)
+        {
+            double rate;
+            switch (user.ExchangeUserType)
+            {
+                case ExchangeUserType.Individual:
+                    rate = DepositPercentIndividual;
+                    break;
+                case ExchangeUserType.Company:
+                    rate = DepositPercentCompanies;
+                    break;
+                case ExchangeUserType.CentralBank:
+                    rate = 0;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return rate;
         }
     }
 }

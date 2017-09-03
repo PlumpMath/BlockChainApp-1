@@ -27,16 +27,16 @@ namespace Logic.Interfaces
         /// <summary>
         /// Получение количества денег у указанного пользователя
         /// </summary>
-        double GetAccountValue(string uniqueUserId);
+        BankAccount GetBankAccount(string uniqueUserId);
 
         /// <summary>
         /// Получение количества денег у указанного пользователя
         /// </summary>
-        BankAccount GetBankAccount(string uniqueUserId);
+        IExchangeUser GetOwnerByBankAccount(string accountUniqueId);
 
         /// <summary>
         /// Осуществление перевода денег
         /// </summary>
-        void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double value);
+        void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice);
     }
 }
