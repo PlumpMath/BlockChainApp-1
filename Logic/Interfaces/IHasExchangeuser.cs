@@ -2,7 +2,7 @@
 
 namespace Logic.Interfaces
 {
-    public interface IHasExchangeuser
+    public interface IHasExchangeUser
     {
         IExchangeUser GetExchangeUser();
     }

@@ -7,7 +7,7 @@ namespace Logic.Interfaces
     /// <summary>
     /// Банк, осуществляющий операции
     /// </summary>
-    public interface IBank : IObserverable, IHasExchangeuser
+    public interface IBank : IObserverable, IHasExchangeUser
     {
         /// <summary>
         /// Вычисление комиссии банковского обсулживания транзакции
