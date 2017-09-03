@@ -8,6 +8,8 @@ namespace Logic.Finance
     {
         public long Id { get; set; }
 
+        public virtual string Name { get; set; }
+
         public DateTime CreatedAt { get; }
 
         public long SellerId { get; }
@@ -21,6 +23,7 @@ namespace Logic.Finance
         public Transaction(long sellerId, long buyerId, double transactionValue, double transactionComission)
         {
             Id = 0;
+            Name = $"Транзакция {Id}";
             SellerId = sellerId;
             BuyerId = buyerId;
             TransactionComission = transactionComission;
@@ -29,9 +32,6 @@ namespace Logic.Finance
             CreatedAt = DateTime.UtcNow;
         }
 
-        public override string ToString()
-        {
-            return $"Транзакция {Id}";
-        }
+        public override string ToString() => Name;
     }
 }

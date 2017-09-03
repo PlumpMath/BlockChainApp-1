@@ -1,14 +1,13 @@
 ﻿using Logic.Entitites;
-using Logic.Interfaces;
 using Logic.Observation;
 using Logic.Participants;
 
-namespace Logic.Bank
+namespace Logic.Interfaces
 {
     /// <summary>
     /// Банк, осуществляющий операции
     /// </summary>
-    public interface IBank : IObserverable
+    public interface IBank : IObserverable, IHasExchangeuser
     {
         /// <summary>
         /// Вычисление комиссии банковского обсулживания транзакции
@@ -46,7 +45,5 @@ namespace Logic.Bank
         /// Осуществление перевода денег
         /// </summary>
         void TransferMoney(IExchangeUser agent, IExchangeUser contrAgent, double value);
-
-        IExchangeUser GetExchangeUser();
     }
 }

@@ -4,7 +4,7 @@ using Utilities.Common;
 
 namespace Logic.Finance
 {
-    public class Chain :  Transaction
+    public sealed class Chain :  Transaction
     {
         public string PreviousHash { get; set; }
 
@@ -13,6 +13,7 @@ namespace Logic.Finance
         public Chain(long sellerId, long buyerId, double transactionValue, double transactionComission) 
             : base(sellerId, buyerId, transactionComission, transactionValue)
         {
+            Name = $"Чейн {Id}";
             CurrentHash = null;
         }
 
@@ -24,11 +25,6 @@ namespace Logic.Finance
             } 
             string text = $"{Id}{SellerId}{BuyerId}{TransactionComission}{TransactionValue}{PreviousHash}{CreatedAt}";
             CurrentHash = MiscUtils.HashEncode(text);
-        }
-
-        public override string ToString()
-        {
-            return $"Чейн {Id}";
         }
 
         public static Chain CreateFromTransaction(Transaction transaction)
