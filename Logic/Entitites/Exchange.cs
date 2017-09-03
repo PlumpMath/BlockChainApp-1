@@ -43,13 +43,14 @@ namespace Logic.Entitites
         {
             foreach (IExchangeUser user in _exchangeUsers)
             {
-                if (user.WannaMissTurn())
-                {
-                    // участник просто не захотел торговаться на этот ход
-                    continue;
-                } 
+                
                 IExchangeUser seller = user;
                 IExchangeUser buyer = GetContrAgent(seller.Id);
+                if (user.WannaMissTurn() || buyer.WannaMissTurn())
+                {
+                    // участники просто не захотели торговаться на этот ход
+                    continue;
+                }
 
                 // Кол-во денег вычисляется рандомно
                 double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
