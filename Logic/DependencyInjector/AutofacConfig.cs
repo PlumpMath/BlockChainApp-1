@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using Logic.Entitites;
+using Logic.Fabrics;
 using Logic.Storages;
 
 namespace Logic.DependencyInjector
@@ -16,10 +17,14 @@ namespace Logic.DependencyInjector
             builder.RegisterType<ChainMemoryStorage>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-            builder.RegisterType<UserMemoryStorage>()
+            builder.RegisterType<ExchangeUserMemoryStorage>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
             builder.RegisterType<TransactionMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<UserFabric>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 

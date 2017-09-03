@@ -10,6 +10,10 @@ namespace Logic.Interfaces
     {
         void Save(TEntity entity);
 
+        void Save(params TEntity[] entities);
+
+        void Save(IEnumerable<TEntity> entities);
+
         TEntity GetEntity(long id);
 
         TEntity GetLastEntity();

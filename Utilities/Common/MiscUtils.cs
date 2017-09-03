@@ -16,8 +16,7 @@ namespace Utilities.Common
             return result.Replace("-", "").ToLower();
         }
 
-        public static TEnumerableEntity GetRandomEntity<TEnumerableEntity>(
-            this IEnumerable<TEnumerableEntity> entities, int seed = 0)
+        public static TEnumerableEntity GetRandomEntity<TEnumerableEntity>(this IEnumerable<TEnumerableEntity> entities)
         {
             int count = entities.Count();
             return entities.ElementAt(GetRandomNumber(count - 1));
@@ -44,117 +43,11 @@ namespace Utilities.Common
             return number.ToString(format);
         }
 
-        public static string GetRandomName()
-        {
-            var name = _names.GetRandomEntity(_randomSeed);
-            _randomSeed++;
-            return name;
-        }
-
         public static bool ContinueByRandom()
         {
             return GetRandomNumber(1) == 1;
         } 
 
-        private static readonly IEnumerable<string> _names = new string[]
-        {
-            "Noah",
-            "Liam",
-            "Mason",
-            "Jacob",
-            "William",
-            "Ethan",
-            "James",
-            "Alexander",
-            "Michael",
-            "Benjamin",
-            "Elijah",
-            "Daniel",
-            "Aiden",
-            "Logan",
-            "Matthew",
-            "Lucas",
-            "Jackson",
-            "David",
-            "Oliver",
-            "Jayden",
-            "Joseph",
-            "Gabriel",
-            "Samuel",
-            "Carter",
-            "Anthony",
-            "John",
-            "Dylan",
-            "Luke",
-            "Henry",
-            "Andrew",
-            "Isaac",
-            "Christopher",
-            "Joshua",
-            "Wyatt",
-            "Sebastian",
-            "Owen",
-            "Caleb",
-            "Nathan",
-            "Ryan",
-            "Jack",
-            "Hunter",
-            "Levi",
-            "Christian",
-            "Jaxon",
-            "Julian",
-            "Landon",
-            "Grayson",
-            "Jonathan",
-            "Isaiah",
-            "Charles",
-            "Thomas",
-            "Aaron",
-            "Eli",
-            "Connor",
-            "Jeremiah",
-            "Cameron",
-            "Josiah",
-            "Adrian",
-            "Colton",
-            "Jordan",
-            "Brayden",
-            "Nicholas",
-            "Robert",
-            "Angel",
-            "Hudson",
-            "Lincoln",
-            "Evan",
-            "Dominic",
-            "Austin",
-            "Gavin",
-            "Nolan",
-            "Parker",
-            "Adam",
-            "Chase",
-            "Jace",
-            "Ian",
-            "Cooper",
-            "Easton",
-            "Kevin",
-            "Jose",
-            "Tyler",
-            "Brandon",
-            "Asher",
-            "Jaxson",
-            "Mateo",
-            "Jason",
-            "Ayden",
-            "Zachary",
-            "Carson",
-            "Xavier",
-            "Leo",
-            "Ezra",
-            "Bentley",
-            "Sawyer",
-            "Kayden",
-            "Blake",
-            "Nathaniel"
-        };
+        
     }
 }

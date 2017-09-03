@@ -34,10 +34,23 @@ namespace Logic.Storages
             }
         }
 
-        public TEntity GetLastEntity() => GetAll().Last();
+        public void Save(params TEntity[] entities)
+        {
+            foreach (TEntity entity in entities)
+            {
+                Save(entity);
+            }
+        }
 
-        public IEnumerable<TEntity> GetAll() =>_list.OrderBy(item => item.Id);
+        public void Save(IEnumerable<TEntity> entities)
+        {
+            Save(entities.ToArray());
+        }
 
-        public TEntity GetEntity(long id) => GetAll().SingleOrDefault(item => item.Id == id);
+        public virtual TEntity GetLastEntity() => GetAll().Last();
+
+        public virtual IEnumerable<TEntity> GetAll() =>_list.OrderBy(item => item.Id);
+
+        public virtual TEntity GetEntity(long id) => GetAll().SingleOrDefault(item => item.Id == id);
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Logic.DependencyInjector;
 using Logic.Entitites;
+using Logic.Fabrics;
 using Logic.Interfaces;
 using Logic.Storages;
 using Utilities.Common;
@@ -23,37 +24,36 @@ namespace ExchangeApplication
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             AutofacConfig.ConfigureContainer();
-            FillUsers();
-            IExchange exchange = CreateExchange();
+
+            var users = CreateUsers();
+            IExchange exchange = CreateExchange(users);
 
             MainWindow mainWindow = new MainWindow(exchange);
             mainWindow.Show();
         }
 
-        private void FillUsers()
+        private IEnumerable<User> CreateUsers()
         {
-            IUserStorage storage = DI.Get<IUserStorage>();
-            for (var i = 0; i < 10; i++)
-            {
-                storage.Save(new User(MiscUtils.GetRandomName()));
-            }
+            IEnumerable<User> users = DI.Get<IUserFabric>().GetEntities(10);
+            DI.Get<IExchangeUserStorage>().Save(users);
+            return users;
         }
 
-        private IExchange CreateExchange()
+        private IExchange CreateExchange(IEnumerable<User> users)
         {
             IBank bank = DI.Get<IBank>();
 
-            var users = new List<IExchangeUser>();
-            users.AddRange(DI.Get<IUserStorage>().GetAll());
+            var exchangeUsers = new List<IExchangeUser>();
+            exchangeUsers.AddRange(users);
 
-            foreach (IExchangeUser user in users)
+            foreach (IExchangeUser exchangeUser in exchangeUsers)
             {
-                bank.CreateAccount(user);
+                bank.CreateAccount(exchangeUser);
             }
             // Банк как участник биржи
-            users.Add((IExchangeUser)bank);
+            exchangeUsers.Add((IExchangeUser)bank);
 
-            var exchange = new Exchange(bank, users);
+            var exchange = new Exchange(bank, exchangeUsers);
             return exchange;
         }
     }

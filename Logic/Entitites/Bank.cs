@@ -48,7 +48,7 @@ namespace Logic.Entitites
         public Bank()
         {
             // Как будто самый старший игрок на рынке
-            Id = 1000;
+            Id = long.MaxValue;
             // При создании открывается свой же собственный счет
             _accounts = new List<BankAccount>
             {

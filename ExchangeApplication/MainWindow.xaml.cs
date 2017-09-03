@@ -154,11 +154,6 @@ namespace ExchangeApplication
             // У чейна тот же айди, что и у транзакции
             Chain chain = _chainStorage.GetEntity(transactionViewModel.Id);
 
-            IUserStorage storage = DI.Get<IUserStorage>();
-            transactionViewModel.SellerName = storage.GetEntity(transactionViewModel.SellerId).Name;
-            transactionViewModel.BuyerName = storage.GetEntity(transactionViewModel.BuyerId).Name;
-
-
             var chainView = new ChainView(new ChainViewModel(chain));
             chainView.Show();
         }

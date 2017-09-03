@@ -54,6 +54,8 @@
     <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Exceptions\ExchangeUserDefaultException.cs" />
     <Compile Include="Extensions\BankExtensions.cs" />
+    <Compile Include="Fabrics\IFabricBase.cs" />
+    <Compile Include="Fabrics\UserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
     <Compile Include="Interfaces\IObserver.cs" />
     <Compile Include="Interfaces\IExchange.cs" />
