@@ -1,4 +1,5 @@
 ﻿using System;
+using Logic.Helpers;
 using Logic.Interfaces;
 using Utilities.Common;
 
@@ -24,6 +25,8 @@ namespace Logic.Participants
         {
             return MiscUtils.ContinueByRandom();
         }
+
+        public virtual ExchangeUserType ExchangeUserType => ExchangeUserType.Unknown;
 
         protected ExchangeUserBase()
         {

@@ -4,8 +4,10 @@ using System.Configuration;
 using System.Linq;
 using Logic.DependencyInjector;
 using Logic.Exceptions;
+using Logic.ExchangeUsers;
 using Logic.Extensions;
 using Logic.Finance;
+using Logic.Helpers;
 using Logic.Interfaces;
 using Logic.Observation;
 using Logic.Participants;
@@ -23,21 +25,28 @@ namespace Logic.Bank
         private static readonly double StartCapital 
             = ConfigurationManager.AppSettings["StartCapital"].ParseAsDouble();
 
-        private static readonly double BankComission 
-            = ConfigurationManager.AppSettings["BankComission"].ParseAsDouble();
+        private static readonly double BankComissionForIndividual 
+            = ConfigurationManager.AppSettings["BankComissionForIndividual"].ParseAsDouble();
+
+        private static readonly double BankComissionForCompanies
+            = ConfigurationManager.AppSettings["BankComissionForCompanies"].ParseAsDouble();
 
         private static readonly double DepositPercent
             = ConfigurationManager.AppSettings["DepositPercent"].ParseAsDouble();
 
-        private static readonly double MaximumByHands
-            = ConfigurationManager.AppSettings["MaximumByHands"].ParseAsDouble();
+        private static readonly double MaximumByHandsIndividual
+            = ConfigurationManager.AppSettings["MaximumByHandsIndividual"].ParseAsDouble();
 
-        private static readonly double MinimumByHands
-            = ConfigurationManager.AppSettings["MinimumByHands"].ParseAsDouble();
+        private static readonly double MinimumByHandsIndividual
+            = ConfigurationManager.AppSettings["MinimumByHandsIndividual"].ParseAsDouble();
+
+        private static readonly double MaximumByHandsCompany
+            = ConfigurationManager.AppSettings["MaximumByHandsCompany"].ParseAsDouble();
+
+        private static readonly double MinimumByHandsCompany
+            = ConfigurationManager.AppSettings["MinimumByHandsCompany"].ParseAsDouble();
 
         private IObserver _observer;
-
-        private readonly ITransactionStorage _transactionStorage;
 
         private readonly IExchangeUser _bankExchangeUser;
 
@@ -67,17 +76,21 @@ namespace Logic.Bank
                     AccountValue = StartCapital
                 }
             };
-
-            
-            _transactionStorage = Injector.Get<ITransactionStorage>();
         }
 
         /// <summary>
         /// Возвращает рандомное кол-во денег для участника в разрешенном диапазоне 
         /// </summary>
-        public double GetRandomMoney()
+        public double GetRandomMoney(IExchangeUser user)
         {
-            double amount = MiscUtils.GetRandomNumber(MaximumByHands, MinimumByHands);
+            double max = user is Company
+                ? MaximumByHandsCompany
+                : MaximumByHandsIndividual;
+            double min = user is Company
+                ? MinimumByHandsCompany
+                : MinimumByHandsIndividual;
+
+            double amount = MiscUtils.GetRandomNumber(max, min);
             AllMoney -= amount;
             return amount;
         }
@@ -122,19 +135,35 @@ namespace Logic.Bank
             }
 
             BankAccount receiverAccount = receiver.GetBankAccount();
-            double comission = CalculateComission(value);
+            
+            double comission = CalculateComission(value, sender);
 
-            receiverAccount.AccountValue += value - comission;
-            senderAccount.AccountValue -= value;
+            receiverAccount.AccountValue += value;
+            senderAccount.AccountValue -= value + comission;
 
             CreateTransaction(receiver.UniqueExchangeId(), sender.UniqueExchangeId(), value, comission);
         }
 
         public IExchangeUser GetExchangeUser() => _bankExchangeUser;
 
-        public double CalculateComission(double invoice)
+        private double CalculateComission(double invoice, IExchangeUser sender)
         {
-            var result = invoice * BankComission;
+            double comissionRate;
+            switch (sender.ExchangeUserType)
+            {
+                case ExchangeUserType.Individual:
+                    comissionRate = BankComissionForIndividual;
+                    break;
+                case ExchangeUserType.Company:
+                    comissionRate = BankComissionForCompanies;
+                    break;
+                case ExchangeUserType.CentralBank:
+                    comissionRate = 0;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            var result = invoice * comissionRate;
             AllMoney += result;
             return result;
         }
@@ -148,7 +177,8 @@ namespace Logic.Bank
             _accounts.Add(new BankAccount
             {
                 UniqueUserId = user.UniqueExchangeId(),
-                AccountValue = GetRandomMoney()
+                AccountValue = GetRandomMoney(user),
+                ExchangeUser = user
             });
         }
 
@@ -191,7 +221,7 @@ namespace Logic.Bank
         private void CreateTransaction(string senderUniqueId, string receiverUniqueId, double invoice, double comission)
         {
             var transaction = new Transaction(senderUniqueId, receiverUniqueId, invoice, comission);
-            _transactionStorage.Save(transaction);
+            Injector.Get<ITransactionStorage>().Save(transaction);
             _observer?.Transaction(transaction);
         }
     }

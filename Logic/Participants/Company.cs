@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Logic.DependencyInjector;
+using Logic.ExchangeUsers;
+using Logic.Finance;
 using Logic.Interfaces;
+using Logic.Storages;
 
 namespace Logic.Participants
 {
@@ -37,13 +43,32 @@ namespace Logic.Participants
             return nameof(Company).ToLowerInvariant() + this.Id;
         }
 
-    }
-
-    public class CompanyExchangeUser : ExchangeUserBase
-    {
-        public override string UniqueExchangeId()
+        public IEnumerable<Share> GetCompanyShares()
         {
-            return nameof(Company).ToLowerInvariant() + Id;
+            return Injector.Get<IShareStorage>().GetByCompanyId(this.Id);
         }
+
+        public int GetCompanyShareCount()
+        {
+            return GetCompanyShares().Count();
+        }
+
+        public double GetCompanyShareBasePrice()
+        {
+            return GetCompanyShares().First().BasePrice;
+        }
+
+        public double GetCompanyShareCurrentPrice()
+        {
+            return GetCompanyShares().First().BasePrice;
+        }
+
+        public double GetCompanyCost()
+        {
+            int count = GetCompanyShareCount();
+            double price = GetCompanyShareCurrentPrice();
+            return price * count;
+        }
+
     }
 }

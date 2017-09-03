@@ -10,13 +10,6 @@ namespace Logic.Interfaces
     public interface IBank : IObserverable, IHasExchangeUser
     {
         /// <summary>
-        /// Вычисление комиссии банковского обсулживания транзакции
-        /// </summary>
-        /// <param name="invoice"></param>
-        /// <returns></returns>
-        double CalculateComission(double invoice);
-
-        /// <summary>
         /// Открытие счета в банке
         /// </summary>
         void CreateAccount(IExchangeUser user);

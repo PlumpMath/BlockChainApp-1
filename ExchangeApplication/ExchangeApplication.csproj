@@ -55,6 +55,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\ChainViewModel.cs" />
+    <Compile Include="ViewModels\CompanyListItemViewModel.cs" />
     <Compile Include="ViewModels\ExchangeUserViewModel.cs" />
     <Compile Include="ViewModels\TransactionViewModel.cs" />
     <Compile Include="Views\ChainView.xaml.cs">

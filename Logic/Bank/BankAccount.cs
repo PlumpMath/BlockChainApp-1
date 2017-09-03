@@ -1,3 +1,5 @@
+using Logic.Interfaces;
+
 namespace Logic.Bank
 {
     public class BankAccount
@@ -5,5 +7,7 @@ namespace Logic.Bank
         public string UniqueUserId { get; set; }
 
         public double AccountValue { get; set; }
+
+        public IExchangeUser ExchangeUser { get; set; }
     }
 }

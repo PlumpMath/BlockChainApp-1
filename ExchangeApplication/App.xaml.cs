@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Logic.Bank;
 using Logic.DependencyInjector;
+using Logic.ExchangeUsers;
 using Logic.Fabrics;
 using Logic.Finance;
 using Logic.Interfaces;
@@ -26,8 +27,8 @@ namespace ExchangeApplication
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             AutofacConfig.ConfigureContainer();
-
-            IEnumerable<User> users = Injector.Get<IUserFabric>().GetEntities(10);
+            IBank bank = Injector.Get<IBank>();
+            IEnumerable<IndividualUser> users = Injector.Get<IIndividualUserFabric>().GetEntities(10);
             IEnumerable<Company> companies = CreateCompanies();
             Injector.Get<IExchangeUserStorage>()
                 .Save(users.Cast<ExchangeUserBase>()
@@ -57,7 +58,7 @@ namespace ExchangeApplication
             return companies;
         }
 
-        private IExchange CreateExchange(IEnumerable<User> users, IEnumerable<Company> companies)
+        private IExchange CreateExchange(IEnumerable<IndividualUser> users, IEnumerable<Company> companies)
         {
             IBank bank = Injector.Get<IBank>();
 

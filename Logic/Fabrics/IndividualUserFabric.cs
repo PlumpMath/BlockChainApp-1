@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using Logic.ExchangeUsers;
 using Logic.Participants;
 using Utilities.Common;
 
 namespace Logic.Fabrics
 {
-    public interface IUserFabric : IFabricBase<User> { }
+    public interface IIndividualUserFabric : IFabricBase<IndividualUser> { }
 
-    public class UserFabric : FabricBase<User>, IUserFabric
+    public class IndividualUserFabric : FabricBase<IndividualUser>, IIndividualUserFabric
     {
         protected override IEnumerable<string> EntityNames => new string[]
         {

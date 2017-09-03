@@ -15,9 +15,6 @@ namespace Logic.Finance
         private static readonly double MaxTransactionPrice
             = ConfigurationManager.AppSettings["MaxTransactionPrice"].ParseAsDouble();
 
-        private static readonly double MaxTransactionDifferenceRate
-            = ConfigurationManager.AppSettings["MaxTransactionDifferenceRate"].ParseAsDouble();
-
         /// <summary>
         /// Список участников
         /// </summary>

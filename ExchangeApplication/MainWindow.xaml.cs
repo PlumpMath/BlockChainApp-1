@@ -59,6 +59,7 @@ namespace ExchangeApplication
 
             InitializeComponent();
             FillData();
+            FillCompanies();
 
             _exchangeTimer = new DispatcherTimer
             {
@@ -81,6 +82,7 @@ namespace ExchangeApplication
             }
 
             FillData();
+            FillCompanies();
         }
 
         private void FillData()
@@ -104,12 +106,32 @@ namespace ExchangeApplication
             TextBlock_BankMoney.Text = MiscUtils.FormatDouble(Injector.Get<IBank>().GetMoneyAmount());
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void FillCompanies()
+        {
+            ListView_Companies.Items.Clear();
+            IEnumerable<Company> companies = Injector.Get<ICompanyStorage>().GetAll();
+
+            for (int i = 0; i < companies.Count(); i++)
+            {
+                Company company = companies.ElementAt(i);
+                var model = new CompanyListItemViewModel
+                {
+                    Name = company.Name,
+                    ShareCount = company.GetCompanyShareCount(),
+                    ShareBasePrice = MiscUtils.FormatDouble(company.GetCompanyShareBasePrice()),
+                    ShareCurrentPrice = MiscUtils.FormatDouble(company.GetCompanyShareCurrentPrice()),
+                    CompanyCost = MiscUtils.FormatDouble(company.GetCompanyCost())
+                };
+                ListView_Companies.Items.Add(model);
+            }
+        }
+
+        private void StartStopExchangeProcess(object sender, RoutedEventArgs e)
         {
             string title = _exchangeTimer.IsEnabled
                 ? "Начать торги"
                 : "Закрыть торги";
-            Button_StartStopExchange.Content = title;
+            MenuItem_StartStopExchange.Header = title;
             _exchangeTimer.IsEnabled = !_exchangeTimer.IsEnabled;
 
             

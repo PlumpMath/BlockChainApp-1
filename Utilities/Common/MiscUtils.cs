@@ -38,7 +38,7 @@ namespace Utilities.Common
         private static Random GetRandom()
         {
             _randomSeed++;
-            return new Random(DateTime.Now.Millisecond + _randomSeed);
+            return new Random(_randomSeed);
         }
 
         public static string FormatDouble(double number, string format = "0.##")

@@ -44,7 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bank\BankExchangeUser.cs" />
+    <Compile Include="ExchangeUsers\BankExchangeUser.cs" />
     <Compile Include="DependencyInjector\AutofacConfig.cs" />
     <Compile Include="Bank\BankAccount.cs" />
     <Compile Include="DependencyInjector\DependencyInjector.cs" />
@@ -53,17 +53,19 @@
     <Compile Include="Fabrics\ShareFabric.cs" />
     <Compile Include="Finance\Exchange.cs" />
     <Compile Include="Finance\Share.cs" />
+    <Compile Include="Helpers\ExchangeUserType.cs" />
     <Compile Include="Interfaces\IHasExchangeuser.cs" />
     <Compile Include="Participants\Company.cs" />
+    <Compile Include="ExchangeUsers\CompanyExchangeUser.cs" />
     <Compile Include="Participants\ExchangeUserBase.cs" />
     <Compile Include="Finance\Transaction.cs" />
-    <Compile Include="Participants\User.cs" />
+    <Compile Include="ExchangeUsers\IndividualUser.cs" />
     <Compile Include="Bank\CentralBank.cs" />
     <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Exceptions\ExchangeUserDefaultException.cs" />
     <Compile Include="Extensions\BankExtensions.cs" />
     <Compile Include="Fabrics\IFabricBase.cs" />
-    <Compile Include="Fabrics\UserFabric.cs" />
+    <Compile Include="Fabrics\IndividualUserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
     <Compile Include="Observation\IObserver.cs" />
     <Compile Include="Interfaces\IExchange.cs" />

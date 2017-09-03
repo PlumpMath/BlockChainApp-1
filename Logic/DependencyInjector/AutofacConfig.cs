@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Logic.Bank;
 using Logic.Fabrics;
+using Logic.Interfaces;
 using Logic.Storages;
 
 namespace Logic.DependencyInjector
@@ -19,7 +20,6 @@ namespace Logic.DependencyInjector
             builder.RegisterType<CentralBank>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
-
             // создаем новый контейнер с теми зависимостями, которые определены выше
             Injector.SetContainer(builder.Build());
         }
@@ -49,7 +49,7 @@ namespace Logic.DependencyInjector
 
         private static void RegisterFabrics(ContainerBuilder builder)
         {
-            builder.RegisterType<UserFabric>()
+            builder.RegisterType<IndividualUserFabric>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 

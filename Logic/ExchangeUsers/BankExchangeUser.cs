@@ -1,8 +1,7 @@
-﻿using System;
-using Logic.Interfaces;
+﻿using Logic.Helpers;
 using Logic.Participants;
 
-namespace Logic.Bank
+namespace Logic.ExchangeUsers
 {
     public class BankExchangeUser : ExchangeUserBase
     {
@@ -10,5 +9,7 @@ namespace Logic.Bank
         {
             return nameof(BankExchangeUser).ToLowerInvariant() + this.Id;
         }
+
+        public override ExchangeUserType ExchangeUserType => ExchangeUserType.CentralBank;
     }
 }

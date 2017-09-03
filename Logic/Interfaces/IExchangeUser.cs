@@ -1,4 +1,5 @@
-﻿using Logic.Participants;
+﻿using Logic.Helpers;
+using Logic.Participants;
 
 namespace Logic.Interfaces
 {
@@ -11,5 +12,7 @@ namespace Logic.Interfaces
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
         bool WannaMissTurn();
+
+        ExchangeUserType ExchangeUserType { get; }
     }
 }
