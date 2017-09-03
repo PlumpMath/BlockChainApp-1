@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Logic.Entitites;
-using Logic.Participants;
+using Logic.Interfaces;
 
-namespace Logic.Interfaces
+namespace Logic.Storages
 {
     /// <summary>
     /// Хранилище для некоторой сущности
@@ -16,6 +15,8 @@ namespace Logic.Interfaces
         void Save(IEnumerable<TEntity> entities);
 
         TEntity GetEntity(long id);
+
+        TEntity GetEntity(string uniqueId);
 
         TEntity GetLastEntity();
 

@@ -12,6 +12,11 @@ namespace Logic.Participants
 
         public string Name { get; set; }
 
+        public virtual string UniqueExchangeId()
+        {
+            return nameof(ExchangeUserBase).ToLowerInvariant() + this.Id;
+        }
+
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
@@ -28,7 +33,7 @@ namespace Logic.Participants
 
         public override string ToString()
         {
-            return $"{Name}";
+            return $"{Name}, UniqueId {UniqueExchangeId()}";
         }
     }
 }

@@ -23,6 +23,8 @@ namespace Logic.Finance
         /// </summary>
         private readonly List<IExchangeUser> _exchangeUsers;
 
+        private readonly List<Company> _companies;
+
         /// <summary>
         /// Управляющий транзакциями банк
         /// </summary>
@@ -30,11 +32,14 @@ namespace Logic.Finance
 
         private IObserver _observer;
 
-        public Exchange(IBank bank, IEnumerable<IExchangeUser> users)
+        public Exchange(IBank bank, IEnumerable<IExchangeUser> users, IEnumerable<Company> companies)
         {
             _bank = bank;
             _exchangeUsers = new List<IExchangeUser>();
             _exchangeUsers.AddRange(users);
+
+            _companies = new List<Company>();
+            _companies.AddRange(companies);
         }
 
         public IEnumerable<IExchangeUser> GetExchangeUsers() => _exchangeUsers;
@@ -55,7 +60,7 @@ namespace Logic.Finance
                 // Кол-во денег вычисляется рандомно
                 double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
 
-                _bank.TransferMoney(seller, buyer, invoice);
+                _bank.TransferMoney(buyer, seller, invoice);
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using Logic.Entitites;
 using Logic.Finance;
 
 namespace Logic.Observation

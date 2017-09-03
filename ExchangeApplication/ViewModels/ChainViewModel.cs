@@ -1,5 +1,4 @@
 ﻿using Logic.DependencyInjector;
-using Logic.Entitites;
 using Logic.Finance;
 using Logic.Storages;
 using Utilities.Common;
@@ -15,14 +14,14 @@ namespace ExchangeApplication.ViewModels
         public ChainViewModel(Chain chain) : base()
         {
             Id = chain.Id;
-            SellerId = chain.SellerId;
-            BuyerId = chain.BuyerId;
+            SenderUniqueId = chain.SenderUniqueId;
+            ReceiverUniqueId = chain.ReceiverUniqueId;
 
             IExchangeUserStorage storage = Injector.Get<IExchangeUserStorage>();
-            var sellerName = storage.GetEntity(SellerId).Name;
-            var buyerName = storage.GetEntity(BuyerId).Name;
-            SellerName = sellerName;
-            BuyerName = buyerName;
+            var sellerName = storage.GetEntity(SenderUniqueId).Name;
+            var buyerName = storage.GetEntity(ReceiverUniqueId).Name;
+            SenderName = sellerName;
+            ReceiverName = buyerName;
             
             TransactionComission = MiscUtils.FormatDouble(chain.TransactionComission);
             TransactionValue = MiscUtils.FormatDouble(chain.TransactionValue);

@@ -1,5 +1,4 @@
 ﻿using System;
-using Logic.Entitites;
 using Utilities.Common;
 
 namespace Logic.Finance
@@ -10,8 +9,8 @@ namespace Logic.Finance
 
         public string CurrentHash { get; set; }
 
-        public Chain(long sellerId, long buyerId, double transactionValue, double transactionComission) 
-            : base(sellerId, buyerId, transactionComission, transactionValue)
+        public Chain(string senderUniqueId, string receiverUniqueId, double transactionValue, double transactionComission) 
+            : base(senderUniqueId, receiverUniqueId, transactionValue, transactionComission)
         {
             Name = $"Чейн {Id}";
             CurrentHash = null;
@@ -23,7 +22,7 @@ namespace Logic.Finance
             {
                 throw new ArgumentNullException(nameof(PreviousHash));
             } 
-            string text = $"{Id}{SellerId}{BuyerId}{TransactionComission}{TransactionValue}{PreviousHash}{CreatedAt}";
+            string text = $"{Id}{SenderUniqueId}{ReceiverUniqueId}{TransactionComission}{TransactionValue}{PreviousHash}{CreatedAt}";
             CurrentHash = MiscUtils.HashEncode(text);
         }
 
@@ -34,7 +33,12 @@ namespace Logic.Finance
                 // чтобы не возникло создания из самого себя
                 throw new InvalidCastException($"Под ссылкой {nameof(Transaction)} передан объект {nameof(Chain)}");
             }
-            return new Chain(transaction.SellerId, transaction.BuyerId, transaction.TransactionValue, transaction.TransactionComission);
+            return new Chain(transaction.SenderUniqueId, transaction.ReceiverUniqueId, transaction.TransactionValue, transaction.TransactionComission);
+        }
+
+        public override string UniqueExchangeId()
+        {
+            return nameof(Chain).ToLowerInvariant() + this.Id;
         }
     }
 }

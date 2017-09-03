@@ -1,4 +1,4 @@
-﻿using Logic.Entitites;
+﻿using Logic.Bank;
 using Logic.Observation;
 using Logic.Participants;
 
@@ -34,16 +34,16 @@ namespace Logic.Interfaces
         /// <summary>
         /// Получение количества денег у указанного пользователя
         /// </summary>
-        double GetAccountValue(long userId);
+        double GetAccountValue(string uniqueUserId);
 
         /// <summary>
         /// Получение количества денег у указанного пользователя
         /// </summary>
-        BankAccount GetBankAccount(long userId);
+        BankAccount GetBankAccount(string uniqueUserId);
 
         /// <summary>
         /// Осуществление перевода денег
         /// </summary>
-        void TransferMoney(IExchangeUser agent, IExchangeUser contrAgent, double value);
+        void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double value);
     }
 }

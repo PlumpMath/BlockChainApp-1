@@ -48,13 +48,17 @@
     <Compile Include="DependencyInjector\AutofacConfig.cs" />
     <Compile Include="Bank\BankAccount.cs" />
     <Compile Include="DependencyInjector\DependencyInjector.cs" />
+    <Compile Include="Fabrics\CompanyFabric.cs" />
+    <Compile Include="Fabrics\FabricBase.cs" />
+    <Compile Include="Fabrics\ShareFabric.cs" />
     <Compile Include="Finance\Exchange.cs" />
+    <Compile Include="Finance\Share.cs" />
     <Compile Include="Interfaces\IHasExchangeuser.cs" />
     <Compile Include="Participants\Company.cs" />
     <Compile Include="Participants\ExchangeUserBase.cs" />
     <Compile Include="Finance\Transaction.cs" />
     <Compile Include="Participants\User.cs" />
-    <Compile Include="Bank\Bank.cs" />
+    <Compile Include="Bank\CentralBank.cs" />
     <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Exceptions\ExchangeUserDefaultException.cs" />
     <Compile Include="Extensions\BankExtensions.cs" />
@@ -68,9 +72,11 @@
     <Compile Include="Storages\ChainMemoryStorage.cs" />
     <Compile Include="Finance\Chain.cs" />
     <Compile Include="Interfaces\IIdentificable.cs" />
+    <Compile Include="Storages\CompanyMemoryStorage.cs" />
     <Compile Include="Storages\IEntityStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Storages\EntityMemoryStorageBase.cs" />
+    <Compile Include="Storages\ShareMemoryStorage.cs" />
     <Compile Include="Storages\TransactionMemoryStorage.cs" />
     <Compile Include="Storages\UserMemoryStorage.cs" />
   </ItemGroup>

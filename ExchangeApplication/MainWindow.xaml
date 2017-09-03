@@ -49,7 +49,7 @@
                         <GridViewColumn Header="Покупатель">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SellerName}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding SenderName}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -57,7 +57,7 @@
                         <GridViewColumn Header="Продавец">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding BuyerName}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding ReceiverName}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

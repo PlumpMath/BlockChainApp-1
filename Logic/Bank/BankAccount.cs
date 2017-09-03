@@ -1,8 +1,8 @@
-namespace Logic.Entitites
+namespace Logic.Bank
 {
     public class BankAccount
     {
-        public long UserId { get; set; }
+        public string UniqueUserId { get; set; }
 
         public double AccountValue { get; set; }
     }

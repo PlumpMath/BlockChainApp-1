@@ -1,33 +1,14 @@
 ﻿using System.Collections.Generic;
-using Logic.Entitites;
 using Logic.Participants;
 using Utilities.Common;
 
 namespace Logic.Fabrics
 {
-    public class UserFabric : IUserFabric
+    public interface IUserFabric : IFabricBase<User> { }
+
+    public class UserFabric : FabricBase<User>, IUserFabric
     {
-        public User GetEntity()
-        {
-            return new User(GetRandomName());
-        }
-
-        public IEnumerable<User> GetEntities(int count)
-        {
-            var list = new List<User>();
-            for (var i = 0; i < count; i++)
-            {
-                list.Add(GetEntity());
-            }
-            return list;
-        }
-
-        public string GetRandomName()
-        {
-            return _names.GetRandomEntity();
-        }
-
-        private static readonly IEnumerable<string> _names = new string[]
+        protected override IEnumerable<string> EntityNames => new string[]
         {
             "Noah",
             "Liam",
@@ -128,6 +109,4 @@ namespace Logic.Fabrics
             "Nathaniel"
         };
     }
-
-    public interface IUserFabric : IFabricBase<User> { }
 }

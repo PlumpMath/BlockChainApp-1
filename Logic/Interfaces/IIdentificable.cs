@@ -9,6 +9,8 @@ namespace Logic.Interfaces
     {
         long Id { get; set;  }
 
+        string UniqueExchangeId();
+
         /// <summary>
         /// Имя участника
         /// </summary>

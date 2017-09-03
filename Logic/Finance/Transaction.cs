@@ -12,24 +12,29 @@ namespace Logic.Finance
 
         public DateTime CreatedAt { get; }
 
-        public long SellerId { get; }
+        public string SenderUniqueId { get; }
 
-        public long BuyerId { get; }
+        public string ReceiverUniqueId { get; }
 
         public double TransactionComission { get; }
 
         public double TransactionValue { get; }
 
-        public Transaction(long sellerId, long buyerId, double transactionValue, double transactionComission)
+        public Transaction(string senderUniqueId, string receiverUniqueId, double transactionValue, double transactionComission)
         {
             Id = 0;
             Name = $"Транзакция {Id}";
-            SellerId = sellerId;
-            BuyerId = buyerId;
+            SenderUniqueId = senderUniqueId;
+            ReceiverUniqueId = receiverUniqueId;
             TransactionComission = transactionComission;
             TransactionValue = transactionValue;
 
             CreatedAt = DateTime.UtcNow;
+        }
+
+        public virtual string UniqueExchangeId()
+        {
+            return nameof(Transaction).ToLowerInvariant() + this.Id;
         }
 
         public override string ToString() => Name;

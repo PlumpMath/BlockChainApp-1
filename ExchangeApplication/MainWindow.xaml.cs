@@ -17,7 +17,6 @@ using ExchangeApplication.ViewModels;
 using ExchangeApplication.Views;
 using Logic.Bank;
 using Logic.DependencyInjector;
-using Logic.Entitites;
 using Logic.Extensions;
 using Logic.Finance;
 using Logic.Interfaces;

@@ -1,5 +1,5 @@
 ﻿using Autofac;
-using Logic.Entitites;
+using Logic.Bank;
 using Logic.Fabrics;
 using Logic.Storages;
 
@@ -13,26 +13,53 @@ namespace Logic.DependencyInjector
             var builder = new ContainerBuilder();
 
             // регистрируем споставление типов
-            builder.RegisterType<ChainMemoryStorage>()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<ExchangeUserMemoryStorage>()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-            builder.RegisterType<TransactionMemoryStorage>()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
+            RegisterStorages(builder);
+            RegisterFabrics(builder);
 
-            builder.RegisterType<UserFabric>()
-                .AsImplementedInterfaces()
-                .InstancePerLifetimeScope();
-
-            builder.RegisterType<Bank.Bank>()
+            builder.RegisterType<CentralBank>()
                 .AsImplementedInterfaces()
                 .InstancePerLifetimeScope();
 
             // создаем новый контейнер с теми зависимостями, которые определены выше
             Injector.SetContainer(builder.Build());
+        }
+
+        private static void RegisterStorages(ContainerBuilder builder)
+        {
+            builder.RegisterType<ChainMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<ExchangeUserMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<TransactionMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<CompanyMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<ShareMemoryStorage>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+        }
+
+        private static void RegisterFabrics(ContainerBuilder builder)
+        {
+            builder.RegisterType<UserFabric>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<CompanyFabric>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<ShareFabric>()
+                .AsImplementedInterfaces()
+                .InstancePerLifetimeScope();
         }
     }
 }

@@ -25,8 +25,8 @@ namespace ExchangeApplication.Views
         {
             InitializeComponent();
             TextBlock_Id.Text = viewModel.Id.ToString();
-            TextBlock_Seller.Text = viewModel.SellerName;
-            TextBlock_Buyer.Text = viewModel.BuyerName;
+            TextBlock_Seller.Text = viewModel.SenderName;
+            TextBlock_Buyer.Text = viewModel.ReceiverName;
 
             TextBlock_TransactionValue.Text = viewModel.TransactionValue;
             TextBlock_TransactionComission.Text = viewModel.TransactionComission;

@@ -1,5 +1,4 @@
-﻿using Logic.Entitites;
-using Logic.Finance;
+﻿using Logic.Finance;
 using Logic.Interfaces;
 
 namespace Logic.Storages

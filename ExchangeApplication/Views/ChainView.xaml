@@ -25,11 +25,11 @@
         </Grid.ColumnDefinitions>
         <Label Content="Id" Margin="10"/>
         <TextBlock Name="TextBlock_Id" Margin="10" TextWrapping="Wrap" Text="" Grid.Column="1"/>
-        <Label Content="Продавец" Margin="10" Grid.Row="1"/>
+        <Label Content="Отправитель" Margin="10" Grid.Row="1"/>
         <TextBlock x:Name="TextBlock_Seller" Margin="10" TextWrapping="Wrap" Text="" Grid.Column="1" Grid.Row="1"/>
-        <Label Content="Покупатель" Margin="10,11,10,10" Grid.Row="2"/>
+        <Label Content="Получатель" Margin="10,11,10,10" Grid.Row="2"/>
         <TextBlock x:Name="TextBlock_Buyer" Margin="10,11,10,10" TextWrapping="Wrap" Text="" Grid.Column="1" Grid.Row="2"/>
-        <Label Content="Стоимость" Margin="10" Grid.Row="3"/>
+        <Label Content="Размер перевода" Margin="10" Grid.Row="3"/>
         <TextBlock x:Name="TextBlock_TransactionValue" Margin="10" TextWrapping="Wrap" Text="" Grid.Column="1" Grid.Row="3"/>
         <Label Content="Комиссия" Margin="10,10,10,9" Grid.Row="4"/>
         <TextBlock x:Name="TextBlock_TransactionComission" Margin="10,10,10,9" TextWrapping="Wrap" Text="" Grid.Column="1" Grid.Row="4"/>
