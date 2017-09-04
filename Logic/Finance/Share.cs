@@ -1,4 +1,5 @@
 ﻿using System;
+using Logic.Helpers;
 using Logic.Interfaces;
 
 namespace Logic.Finance
@@ -12,6 +13,8 @@ namespace Logic.Finance
         public double CurrentPrice { get; set; }
 
         public double BasePrice { get; set; }
+
+        public SharePriceChangingType PriceChangingTrand { get; set; }
 
         public long CompanyId { get; set; }
 

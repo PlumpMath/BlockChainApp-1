@@ -6,6 +6,7 @@ using Logic.ExchangeUsers;
 using Logic.Finance;
 using Logic.Interfaces;
 using Logic.Storages;
+using Utilities.Common;
 
 namespace Logic.Participants
 {
@@ -60,7 +61,12 @@ namespace Logic.Participants
 
         public double GetCompanyShareCurrentPrice()
         {
-            return GetCompanyShares().First().BasePrice;
+            return GetCompanyShares().First().CurrentPrice;
+        }
+
+        public string GetCompanySharePriceChangingTrand()
+        {
+            return GetCompanyShares().First().PriceChangingTrand.GetEnumValueDescription();
         }
 
         public double GetCompanyCost()

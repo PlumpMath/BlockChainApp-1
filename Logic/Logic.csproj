@@ -42,8 +42,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationTypes" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\NotExchangeUserOwnedSharesException.cs" />
     <Compile Include="ExchangeUsers\BankExchangeUser.cs" />
     <Compile Include="DependencyInjector\AutofacConfig.cs" />
     <Compile Include="Bank\BankAccount.cs" />
@@ -53,8 +55,10 @@
     <Compile Include="Fabrics\ShareFabric.cs" />
     <Compile Include="Finance\Exchange.cs" />
     <Compile Include="Finance\Share.cs" />
-    <Compile Include="Finance\ShareController.cs" />
+    <Compile Include="Extensions\ShareExtensions.cs" />
+    <Compile Include="Finance\ShareInvoiceInfo.cs" />
     <Compile Include="Helpers\ExchangeUserType.cs" />
+    <Compile Include="Helpers\SharePriceChangingType.cs" />
     <Compile Include="Interfaces\IHasExchangeuser.cs" />
     <Compile Include="Participants\Company.cs" />
     <Compile Include="ExchangeUsers\CompanyExchangeUser.cs" />

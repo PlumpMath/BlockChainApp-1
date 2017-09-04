@@ -11,5 +11,7 @@
         public int ShareCount { get; set; }
 
         public string CompanyCost { get; set; }
+
+        public string PriceChangeTrand { get; set; }
     }
 }

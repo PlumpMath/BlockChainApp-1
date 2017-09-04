@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -38,7 +40,7 @@ namespace Utilities.Common
         private static Random GetRandom()
         {
             _randomSeed++;
-            return new Random(_randomSeed);
+            return new Random(DateTime.Now.Millisecond + _randomSeed);
         }
 
         public static string FormatDouble(double number, string format = "0.##")
@@ -46,10 +48,17 @@ namespace Utilities.Common
             return number.ToString(format);
         }
 
-        public static bool ContinueByRandom()
+        public static string GetEnumValueDescription<TEnum>(this TEnum enumValue)
         {
-            return GetRandomNumber(1) == 1;
-        } 
+            FieldInfo fi = enumValue.GetType().GetField(enumValue.ToString());
+
+            DescriptionAttribute[] attributes = (DescriptionAttribute[])fi.GetCustomAttributes(
+                typeof(DescriptionAttribute), false);
+
+            return attributes.Length > 0 
+                ? attributes[0].Description : 
+                enumValue.ToString();
+        }
 
         
     }

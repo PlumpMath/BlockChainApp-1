@@ -1,10 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Logic.Bank;
+using Logic.DependencyInjector;
+using Logic.Extensions;
 using Logic.Interfaces;
 using Logic.Observation;
 using Logic.Participants;
+using Logic.Storages;
 using Utilities.Common;
 using Utilities.Convert;
 
@@ -48,9 +53,9 @@ namespace Logic.Finance
                 
                 IExchangeUser buyer = user;
                 IExchangeUser seller = GetContrAgent(buyer.Id);
-                if (user.WannaMissTurn() || buyer.WannaMissTurn())
+                if (buyer.WannaMissTurn())
                 {
-                    // участники просто не захотели торговаться на этот ход
+                    // Если участник-покупатель не захотел торговать сейчас
                     continue;
                 }
                 TryMakeDeal(buyer, seller);
@@ -69,10 +74,28 @@ namespace Logic.Finance
 
         private void TryMakeDeal(IExchangeUser buyer, IExchangeUser seller)
         {
-            // Кол-во денег вычисляется рандомно
-            double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
+            IEnumerable<Share> sellerShares = seller.GetOwnedShares();
+            if (!sellerShares.Any())
+            {
+                // если у продавца нет акций
+                return;
+            }
 
-            _bank.TransferMoney(buyer, seller, invoice);
+            ShareInvoiceInfo invoice = sellerShares.GetRandomShareInvoiceInfo();
+
+            if (!buyer.WannaBuyShares(invoice))
+            {
+                // Если покупатель не захотел покупать акции по некоторой причине
+                seller.DecreaseSharePriceIfWantTo(invoice.CompanyId);
+                return;
+            }
+
+            seller.DeattachShares(invoice);
+            buyer.TakeShares(invoice);
+            // Кол-во денег вычисляется рандомно
+            // double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
+
+            _bank.TransferMoney(buyer, seller, invoice.Cost);
         }
 
         /// <summary>

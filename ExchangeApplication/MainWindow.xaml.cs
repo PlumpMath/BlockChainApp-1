@@ -42,7 +42,7 @@ namespace ExchangeApplication
 
         private readonly DispatcherTimer _exchangeTimer;
 
-        private const int DepositPayoutTick = 9;
+        private const int DepositPayoutTick = 29;
 
         private int _depositPayoutTickCount = 0;
 
@@ -63,7 +63,7 @@ namespace ExchangeApplication
 
             _exchangeTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(200)
+                Interval = TimeSpan.FromMilliseconds(150)
             };
             _exchangeTimer.Tick += _exchangeTimer_Tick;
         }
@@ -120,7 +120,8 @@ namespace ExchangeApplication
                     ShareCount = company.GetCompanyShareCount(),
                     ShareBasePrice = MiscUtils.FormatDouble(company.GetCompanyShareBasePrice()),
                     ShareCurrentPrice = MiscUtils.FormatDouble(company.GetCompanyShareCurrentPrice()),
-                    CompanyCost = MiscUtils.FormatDouble(company.GetCompanyCost())
+                    CompanyCost = MiscUtils.FormatDouble(company.GetCompanyCost()),
+                    PriceChangeTrand = company.GetCompanySharePriceChangingTrand()
                 };
                 ListView_Companies.Items.Add(model);
             }
