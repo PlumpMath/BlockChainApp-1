@@ -10,6 +10,6 @@ namespace Logic.ExchangeUsers
             return nameof(Company).ToLowerInvariant() + Id;
         }
 
-        public override ExchangeUserType ExchangeUserType => ExchangeUserType.Company;
+        public override ExchangeUserType GetExchangeUserType() => ExchangeUserType.Company;
     }
 }

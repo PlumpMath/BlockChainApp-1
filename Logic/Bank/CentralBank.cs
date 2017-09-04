@@ -88,7 +88,7 @@ namespace Logic.Bank
         /// </summary>
         public double GetRandomMoney(IExchangeUser user)
         {
-            bool isCompany = user.ExchangeUserType == ExchangeUserType.Company;
+            bool isCompany = user.GetExchangeUserType() == ExchangeUserType.Company;
             double max = isCompany
                 ? MaximumByHandsCompany
                 : MaximumByHandsIndividual;
@@ -135,17 +135,14 @@ namespace Logic.Bank
         /// Перечисление денег между продавцом и покупателем. 
         /// Возвращает флаг, произошла ли сделка
         /// </summary>
-        public void TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice)
+        public bool TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice)
         {
-            BankAccount senderAccount = sender.GetBankAccount();
-
-
-            if (senderAccount.AccountValue < invoice)
+            if (!sender.GotEnoughMoney(invoice))
             {
                 // Если нет денег, то сделка не удалась
-                return;
+                return false;
             }
-
+            BankAccount senderAccount = sender.GetBankAccount();
             BankAccount receiverAccount = receiver.GetBankAccount();
             
             double comissionRate = senderAccount.TransactionComissionRate;
@@ -158,13 +155,14 @@ namespace Logic.Bank
             senderAccount.AccountValue -= invoice + comission;
 
             CreateTransaction(sender, receiver, invoice, comission);
+            return true;
         }
 
         public IExchangeUser GetExchangeUser() => _bankExchangeUser;
 
         public void CreateAccount(IExchangeUser user)
         {
-            if (user.ExchangeUserType == ExchangeUserType.CentralBank)
+            if (user.GetExchangeUserType() == ExchangeUserType.CentralBank)
             {
                 throw new ArgumentException("Нельзя создать счет у банка повторно");
             }
@@ -227,7 +225,7 @@ namespace Logic.Bank
         private double DefineTransactionComissionRateBasedOnUser(IExchangeUser user)
         {
             double rate;
-            switch (user.ExchangeUserType)
+            switch (user.GetExchangeUserType())
             {
                 case ExchangeUserType.Individual:
                     rate = BankComissionForIndividual;
@@ -247,7 +245,7 @@ namespace Logic.Bank
         private double DefineDepositPercentRateBasedOnUser(IExchangeUser user)
         {
             double rate;
-            switch (user.ExchangeUserType)
+            switch (user.GetExchangeUserType())
             {
                 case ExchangeUserType.Individual:
                     rate = DepositPercentIndividual;

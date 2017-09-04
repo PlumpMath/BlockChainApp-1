@@ -1,4 +1,6 @@
-﻿using Logic.Helpers;
+﻿using System.Collections.Generic;
+using Logic.Finance;
+using Logic.Helpers;
 using Logic.Participants;
 
 namespace Logic.Interfaces
@@ -13,6 +15,12 @@ namespace Logic.Interfaces
         /// </summary>
         bool WannaMissTurn();
 
-        ExchangeUserType ExchangeUserType { get; }
+        bool WannaSellShares(Share share, int count);
+
+        bool WannaBuyShares(Share share, int count);
+
+        IEnumerable<Share> GetOwnedShares();
+
+        ExchangeUserType GetExchangeUserType();
     }
 }

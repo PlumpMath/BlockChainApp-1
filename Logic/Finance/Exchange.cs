@@ -46,18 +46,14 @@ namespace Logic.Finance
             foreach (IExchangeUser user in _exchangeUsers)
             {
                 
-                IExchangeUser seller = user;
-                IExchangeUser buyer = GetContrAgent(seller.Id);
+                IExchangeUser buyer = user;
+                IExchangeUser seller = GetContrAgent(buyer.Id);
                 if (user.WannaMissTurn() || buyer.WannaMissTurn())
                 {
                     // участники просто не захотели торговаться на этот ход
                     continue;
                 }
-
-                // Кол-во денег вычисляется рандомно
-                double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
-
-                _bank.TransferMoney(buyer, seller, invoice);
+                TryMakeDeal(buyer, seller);
             }
         }
 
@@ -69,6 +65,14 @@ namespace Logic.Finance
             double allPercents = _bank.PayoutDepositPercent();
             var text = $"Выплачены проценты по депозитам {MiscUtils.FormatDouble(allPercents)}";
             _observer?.CommonMessage(text);
+        }
+
+        private void TryMakeDeal(IExchangeUser buyer, IExchangeUser seller)
+        {
+            // Кол-во денег вычисляется рандомно
+            double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
+
+            _bank.TransferMoney(buyer, seller, invoice);
         }
 
         /// <summary>

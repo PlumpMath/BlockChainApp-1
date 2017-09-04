@@ -15,7 +15,7 @@ namespace Logic.Finance
 
         public long CompanyId { get; set; }
 
-        public long OwnerId { get; set; }
+        public string OwnerUniqueId { get; set; }
         
         public DateTime CreatedAt { get; }
 

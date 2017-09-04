@@ -10,6 +10,6 @@ namespace Logic.ExchangeUsers
             return nameof(BankExchangeUser).ToLowerInvariant() + this.Id;
         }
 
-        public override ExchangeUserType ExchangeUserType => ExchangeUserType.CentralBank;
+        public override ExchangeUserType GetExchangeUserType() => ExchangeUserType.CentralBank;
     }
 }

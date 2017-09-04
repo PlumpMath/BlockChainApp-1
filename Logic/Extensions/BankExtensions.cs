@@ -11,6 +11,11 @@ namespace Logic.Extensions
             return GetBankAccount(user).AccountValue;
         }
 
+        public static bool GotEnoughMoney(this IExchangeUser user, double invoice)
+        {
+            return GetBankAccount(user).AccountValue >= invoice;
+        }
+
         public static BankAccount GetBankAccount(this IExchangeUser user)
         {
             return Injector.Get<IBank>().GetBankAccount(user.UniqueExchangeId());

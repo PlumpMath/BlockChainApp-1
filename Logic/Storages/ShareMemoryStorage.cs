@@ -9,7 +9,7 @@ namespace Logic.Storages
     {
         IEnumerable<Share> GetByCompanyId(long companyId);
 
-        IEnumerable<Share> GetByOwnerId(long ownerId);
+        IEnumerable<Share> GetByOwnerId(string ownerUniqueId);
     }
 
     public class ShareMemoryStorage : EntityMemoryStorageBase<Share>, IShareStorage
@@ -19,9 +19,9 @@ namespace Logic.Storages
             return GetAll().Where(share => share.CompanyId == companyId);
         }
 
-        public IEnumerable<Share> GetByOwnerId(long ownerId)
+        public IEnumerable<Share> GetByOwnerId(string ownerUniqueId)
         {
-            return GetAll().Where(share => share.OwnerId == ownerId);
+            return GetAll().Where(share => share.OwnerUniqueId == ownerUniqueId);
         }
     }
 }

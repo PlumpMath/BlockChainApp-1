@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Logic.DependencyInjector;
+using Logic.Finance;
 using Logic.Helpers;
 using Logic.Interfaces;
+using Logic.Storages;
 using Utilities.Common;
 
 namespace Logic.Participants
@@ -13,10 +17,7 @@ namespace Logic.Participants
 
         public string Name { get; set; }
 
-        public virtual string UniqueExchangeId()
-        {
-            return nameof(ExchangeUserBase).ToLowerInvariant() + this.Id;
-        }
+        public abstract string UniqueExchangeId();
 
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
@@ -26,7 +27,22 @@ namespace Logic.Participants
             return MiscUtils.ContinueByRandom();
         }
 
-        public virtual ExchangeUserType ExchangeUserType => ExchangeUserType.Unknown;
+        public bool WannaSellShares(Share share, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool WannaBuyShares(Share share, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Share> GetOwnedShares()
+        {
+            return Injector.Get<IShareStorage>().GetByOwnerId(UniqueExchangeId());
+        }
+
+        public abstract ExchangeUserType GetExchangeUserType();
 
         protected ExchangeUserBase()
         {

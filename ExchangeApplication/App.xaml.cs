@@ -50,7 +50,7 @@ namespace ExchangeApplication
             {
                 int count = MiscUtils.GetRandomNumber(300, 10);
                 double price = MiscUtils.GetRandomNumber(1000.0, 10.0);
-                IEnumerable<Share> shares = Injector.Get<IShareFabric>().GetEntitiesOfCompany(company.Id, count, price);
+                IEnumerable<Share> shares = Injector.Get<IShareFabric>().GetEntitiesOfCompany(company.Id, company.UniqueExchangeId(), count, price);
                 Injector.Get<IShareStorage>().Save(shares);
             }
             Injector.Get<IExchangeUserStorage>()

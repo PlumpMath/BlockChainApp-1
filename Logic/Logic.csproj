@@ -53,6 +53,7 @@
     <Compile Include="Fabrics\ShareFabric.cs" />
     <Compile Include="Finance\Exchange.cs" />
     <Compile Include="Finance\Share.cs" />
+    <Compile Include="Finance\ShareController.cs" />
     <Compile Include="Helpers\ExchangeUserType.cs" />
     <Compile Include="Interfaces\IHasExchangeuser.cs" />
     <Compile Include="Participants\Company.cs" />

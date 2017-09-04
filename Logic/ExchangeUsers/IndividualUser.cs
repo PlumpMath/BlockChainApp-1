@@ -17,6 +17,6 @@ namespace Logic.ExchangeUsers
             return nameof(IndividualUser).ToLowerInvariant() + Id;
         }
 
-        public override ExchangeUserType ExchangeUserType => ExchangeUserType.Individual;
+        public override ExchangeUserType GetExchangeUserType() => ExchangeUserType.Individual;
     }
 }
