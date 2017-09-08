@@ -29,12 +29,17 @@ namespace Logic.Participants
         /// Получение списка акций, принадлежащих пользователю
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<Share> GetMineShares(long? companyId = null)
+        private ICollection<Share> GetMineShares(long? companyId = null)
         {
-            var shares = Injector.Get<IShareStorage>().GetByOwnerId(this.UniqueExchangeId());
+            var shares = Injector.Get<IShareStorage>().GetByOwnerId(this.UniqueExchangeId()).ToArray();
             return companyId.HasValue 
-                ? shares.Where(share => share.CompanyId == companyId) 
+                ? shares.Where(share => share.CompanyId == companyId).ToArray()
                 : shares;
+        }
+
+        public int OwnedShareCount
+        {
+            get { return GetMineShares().Count(); }
         }
 
         /// <summary>
@@ -42,7 +47,7 @@ namespace Logic.Participants
         /// </summary>
         public virtual bool WannaMissTurn()
         {
-            return MakeRandomDecision();
+            return MakeRandomDecision(70);
         }
 
         public bool WannaBuyShares(ShareInvoiceInfo invoice)
@@ -59,7 +64,7 @@ namespace Logic.Participants
                 // Если на счету останется меньше 20% после сделки, то тоже отказываемся
                 return false;
             }
-            int riskness = MiscUtils.GetRandomNumber(90, 20);
+            int riskness = MiscUtils.GetRandomNumber(100, 40);
             if (invoice.Trand == SharePriceChangingType.Increasing)
             {
                 riskness += 10;
@@ -80,11 +85,14 @@ namespace Logic.Participants
             }
 
             // Непосредственно отчуждение прав на владение акциями
-            invoice.Shares = invoice.Shares.Select(share =>
+            var list = new List<Share>();
+            foreach (Share invoiceShare in invoice.Shares)
             {
-                share.OwnerUniqueId = null;
-                return share;
-            });
+                string id = UniqueExchangeId();
+                invoiceShare.OwnerUniqueId = id;
+                list.Add(invoiceShare);
+            }
+            invoice.Shares = list;
             // Раздумье, стоит ли повысить цену на акции, если хочет или остались в наличии
             IncreaseSharePriceIfWantTo(invoice.CompanyId);
         }
@@ -97,12 +105,15 @@ namespace Logic.Participants
                     $"Переданные акции уже принадлежат пользователю {UniqueExchangeId()}");
             }
             // Перебивка владельца акций
-            invoice.Shares = invoice.Shares.Select(share =>
+            var list = new List<Share>();
+            foreach (Share invoiceShare in invoice.Shares)
             {
-                share.OwnerUniqueId = UniqueExchangeId();
-                return share;
-            });
-            Injector.Get<IShareStorage>().Save(invoice.Shares);
+                string id = UniqueExchangeId();
+                invoiceShare.OwnerUniqueId = id;
+                list.Add(invoiceShare);
+            }
+            invoice.Shares = list;
+            Injector.Get<IShareStorage>().Save(list);
             // На вновь полученные акции пользователь может захотеть повысить цену сразу
             IncreaseSharePriceIfWantTo(invoice.CompanyId);
         }
@@ -120,6 +131,13 @@ namespace Logic.Participants
         public void ChangeSharePriceIfWantTo(long companyId)
         {
             ChangeSharePriceIfWantTo(companyId, ShareHelpers.GetPriceChangingTypeByRandom());
+        }
+
+        public double MakeInvoiceOffer()
+        {
+            const double MaxCouldSpendRate = 0.8;
+            double mineMoney = this.GetBankAccountValue();
+            return mineMoney * MaxCouldSpendRate;
         }
 
         private void ChangeSharePriceIfWantTo(long companyId, SharePriceChangingType sharePriceChangingType)
@@ -147,9 +165,9 @@ namespace Logic.Participants
             return true;
         }
 
-        public IEnumerable<Share> GetOwnedShares()
+        public ICollection<Share> GetOwnedShares()
         {
-            return Injector.Get<IShareStorage>().GetByOwnerId(UniqueExchangeId());
+            return GetMineShares();
         }
 
         public abstract ExchangeUserType GetExchangeUserType();

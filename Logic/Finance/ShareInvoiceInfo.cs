@@ -5,7 +5,7 @@ namespace Logic.Finance
 {
     public class ShareInvoiceInfo
     {
-        public IEnumerable<Share> Shares { get; set; }
+        public ICollection<Share> Shares { get; set; }
 
         public long CompanyId;
 

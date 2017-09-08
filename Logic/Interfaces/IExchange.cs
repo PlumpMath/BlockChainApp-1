@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Logic.Finance;
 using Logic.Observation;
 using Logic.Participants;
 using Logic.Storages;
@@ -19,7 +20,7 @@ namespace Logic.Interfaces
         /// <summary>
         /// Осуществление торгов. Должно выполняться периодически
         /// </summary>
-        void ExecuteExchanging();
+        ExchangeStepResult ExecuteExchanging();
 
         /// <summary>
         /// Указание банковскому регулятору выплатить проценты по депозитам

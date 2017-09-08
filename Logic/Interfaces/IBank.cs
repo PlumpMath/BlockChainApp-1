@@ -37,6 +37,6 @@ namespace Logic.Interfaces
         /// <summary>
         /// Осуществление перевода денег
         /// </summary>
-        bool TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice);
+        bool TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice, out double comission);
     }
 }

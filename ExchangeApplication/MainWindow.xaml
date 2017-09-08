@@ -36,45 +36,53 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
+
+                        <GridViewColumn Header="Владеет акциями">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding OwnedSharesCount}" HorizontalAlignment="Stretch" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
             <Label Content="Участники биржи" Grid.Column="3" Margin="10,13,10,0" Grid.Row="2" VerticalAlignment="Top" Height="26"/>
-            <Label Content="Кол-во денег в обращении" Grid.Column="3" HorizontalAlignment="Left" Margin="10,5,0,12" Width="165" Grid.Row="3" Panel.ZIndex="1"/>
-            <TextBlock x:Name="TextBlock_BankMoney" Grid.Column="3" Margin="199,10,10,15" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
+            <Label Content="Кол-во денег в обращении" Grid.Column="2" HorizontalAlignment="Left" Margin="10,5,0,12" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
+            <TextBlock x:Name="TextBlock_BankMoney" Grid.Column="2" Margin="179,10,147,15" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
             <TextBox Margin="10,44,10,10" Grid.Row="2" TextWrapping="Wrap" Text="" Name="TextBox_Log" Grid.ColumnSpan="2"/>
             <Label Content="События биржи" Margin="10,10,218,0" Grid.Row="2" VerticalAlignment="Top" Height="26"/>
-            <ListView x:Name="ListView_Transactions" Margin="10,41,10,10" Grid.Row="1" MouseDoubleClick="ListView_Transactions_MouseDoubleClick">
+            <ListView x:Name="ListView_TransactionsSummary" Margin="10,41,10,10" Grid.Row="1">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Отправитель">
+                        <GridViewColumn Header="#">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding SenderName}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding ExchangeStep}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Получатель">
+                        <GridViewColumn Header="Сумма торгов">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ReceiverName}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding StepDealMoneySumm}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Сумма">
+                        <GridViewColumn Header="Общая комиссия">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding TransactionValue}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding StepDealBanlComission}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Комиссия">
+                        <GridViewColumn Header="Кол-во сделок">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding TransactionComission}" HorizontalAlignment="Stretch" />
+                                    <TextBlock Text="{Binding StepDealCount}" HorizontalAlignment="Stretch" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -134,8 +142,11 @@
             <Label Content="Компании на бирже" Grid.Column="1" Margin="10,6,10,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
             <Menu Grid.ColumnSpan="4">
                 <MenuItem Header="Начать торги" Height="42" Name="MenuItem_StartStopExchange" Click="StartStopExchangeProcess" Padding="5px"/>
+                <MenuItem Header="Транзакции" Name="MenuItem_Transactions" Click="MenuItem_Transactions_OnClick" />
             </Menu>
             <DockPanel LastChildFill="False" Grid.Row="3" Grid.ColumnSpan="4" Background="#FFD4D4D4"/>
+            <Label Content="Кол-во денег в обращении" Grid.Column="1" HorizontalAlignment="Left" Margin="8,8,0,9" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
+            <TextBlock x:Name="TextBlock_ShareCount" Grid.Column="1" Margin="177,13,116,12" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
         </Grid>
 
     </Grid>

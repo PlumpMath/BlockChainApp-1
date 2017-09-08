@@ -135,18 +135,19 @@ namespace Logic.Bank
         /// Перечисление денег между продавцом и покупателем. 
         /// Возвращает флаг, произошла ли сделка
         /// </summary>
-        public bool TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice)
+        public bool TransferMoney(IExchangeUser sender, IExchangeUser receiver, double invoice, out double comission)
         {
             if (!sender.GotEnoughMoney(invoice))
             {
                 // Если нет денег, то сделка не удалась
+                comission = 0;
                 return false;
             }
             BankAccount senderAccount = sender.GetBankAccount();
             BankAccount receiverAccount = receiver.GetBankAccount();
             
             double comissionRate = senderAccount.TransactionComissionRate;
-            double comission = invoice * comissionRate;
+            comission = invoice * comissionRate;
 
             // Перечисление комиссии в счет банка
             AllMoney += comission;

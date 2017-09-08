@@ -9,7 +9,7 @@ namespace Logic.Extensions
 {
     public static class ShareExtensions
     {
-        public static IEnumerable<Share> GetSharesOfOneRandomCompany(this IEnumerable<Share> shares, out long outCompanyId)
+        public static ICollection<Share> GetSharesOfOneRandomCompany(this ICollection<Share> shares, out long outCompanyId)
         {
             IEnumerable<long> companyIds = shares
                 .Select(share => share.CompanyId)
@@ -19,18 +19,28 @@ namespace Logic.Extensions
             int randomIndex = MiscUtils.GetRandomNumber(count);
             long companyId = companyIds.ElementAt(randomIndex);
             outCompanyId = companyId;
-            return shares.Where(share => share.CompanyId == companyId);
+            return shares.Where(share => share.CompanyId == companyId).ToArray();
         }
 
-        public static ShareInvoiceInfo GetRandomShareInvoiceInfo(this IEnumerable<Share> shares)
+        public static ShareInvoiceInfo GetRandomShareInvoiceInfo(this ICollection<Share> shares, double invoiceOffer)
         {
             // Взятие акций одной компании
             shares = shares.GetSharesOfOneRandomCompany(out long companyId);
             int shareForSaleCount = shares.Count();
+            double currentPrice = shares.First().CurrentPrice;
 
-            // рандомное количество акций на продажу
-            int count = MiscUtils.GetRandomNumber(shareForSaleCount, 1);
-            shares = shares.Take(count);
+            double allSharesCost = currentPrice * shareForSaleCount;
+
+            if (allSharesCost > invoiceOffer)
+            {
+                int couldBuyCount = (int)Math.Floor(invoiceOffer / currentPrice);
+
+                if (couldBuyCount == 0)
+                {
+                    return null;
+                }
+                shares = shares.Take(couldBuyCount).ToArray();
+            }        
 
             // вычисление общей стоимости акций на основе текущей цены
             double invoice = shares.GetSharesCost();

@@ -28,7 +28,7 @@ namespace ExchangeApplication
         {
             AutofacConfig.ConfigureContainer();
             IBank bank = Injector.Get<IBank>();
-            IEnumerable<IndividualUser> users = Injector.Get<IIndividualUserFabric>().GetEntities(10);
+            IEnumerable<IndividualUser> users = Injector.Get<IIndividualUserFabric>().GetEntities(30);
             IEnumerable<Company> companies = CreateCompanies();
             Injector.Get<IExchangeUserStorage>()
                 .Save(users.Cast<ExchangeUserBase>()
@@ -43,7 +43,7 @@ namespace ExchangeApplication
 
         private IEnumerable<Company> CreateCompanies()
         {
-            IEnumerable<Company> companies = Injector.Get<ICompanyFabric>().GetEntities(10);
+            IEnumerable<Company> companies = Injector.Get<ICompanyFabric>().GetEntities(20);
             Injector.Get<ICompanyStorage>().Save(companies);
 
             foreach (Company company in companies)

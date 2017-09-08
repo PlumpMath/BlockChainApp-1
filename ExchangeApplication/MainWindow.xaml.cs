@@ -46,6 +46,8 @@ namespace ExchangeApplication
 
         private int _depositPayoutTickCount = 0;
 
+        private long _exchangeStepCount = 0;
+
         public MainWindow(IExchange exchange)
         {
             _exchange = exchange;
@@ -59,6 +61,7 @@ namespace ExchangeApplication
 
             InitializeComponent();
             FillData();
+            FillBaseData();
             FillCompanies();
 
             _exchangeTimer = new DispatcherTimer
@@ -70,7 +73,9 @@ namespace ExchangeApplication
 
         private void _exchangeTimer_Tick(object sender, EventArgs e)
         {
-            _exchange.ExecuteExchanging();
+            ExchangeStepResult stepResult = _exchange.ExecuteExchanging();
+            _exchangeStepCount++;
+
             if (_depositPayoutTickCount == DepositPayoutTick)
             {
                 _exchange.PayoutDepositPercents();
@@ -82,7 +87,13 @@ namespace ExchangeApplication
             }
 
             FillData();
+            FillBaseData();
             FillCompanies();
+            if (stepResult != null) 
+            {
+                DisplayExchangeStepResult(new ExchangeStepResultViewModel(stepResult, _exchangeStepCount));
+            }
+            
         }
 
         private void FillData()
@@ -98,12 +109,18 @@ namespace ExchangeApplication
                 var model = new ExchangeUserViewModel
                 {
                     Name = user.Name,
-                    Wallet = MiscUtils.FormatDouble(user.GetBankAccountValue())
+                    Wallet = MiscUtils.FormatDouble(user.GetBankAccountValue()),
+                    OwnedSharesCount = user.OwnedShareCount
                 };
                 ListView_Users.Items.Add(model);
             }
             //---------------------
+        }
+
+        private void FillBaseData()
+        {
             TextBlock_BankMoney.Text = MiscUtils.FormatDouble(Injector.Get<IBank>().GetMoneyAmount());
+            TextBlock_ShareCount.Text = Injector.Get<IShareStorage>().GetAll().Count().ToString();
         }
 
         private void FillCompanies()
@@ -127,6 +144,13 @@ namespace ExchangeApplication
             }
         }
 
+        private void DisplayExchangeStepResult(ExchangeStepResultViewModel stepResultViewModel)
+        {
+            ListView_TransactionsSummary.Items.Add(stepResultViewModel);
+            ListView_TransactionsSummary.SelectedIndex = ListView_TransactionsSummary.Items.Count - 1;
+            ListView_TransactionsSummary.ScrollIntoView(ListView_TransactionsSummary.SelectedItem);
+        }
+
         private void StartStopExchangeProcess(object sender, RoutedEventArgs e)
         {
             string title = _exchangeTimer.IsEnabled
@@ -134,8 +158,6 @@ namespace ExchangeApplication
                 : "Закрыть торги";
             MenuItem_StartStopExchange.Header = title;
             _exchangeTimer.IsEnabled = !_exchangeTimer.IsEnabled;
-
-            
         }
 
         public void CommonMessage(string message)
@@ -146,9 +168,6 @@ namespace ExchangeApplication
         public void Transaction(Transaction transaction)
         {
             CreateNewChain(transaction);
-            ListView_Transactions.Items.Add(new TransactionViewModel(transaction));
-            ListView_Transactions.SelectedIndex = ListView_Transactions.Items.Count - 1;
-            ListView_Transactions.ScrollIntoView(ListView_Transactions.SelectedItem);
         }
 
         public void Exception(Exception exception)
@@ -170,18 +189,13 @@ namespace ExchangeApplication
             _chainStorage.Save(chain);
         }
 
-        private void ListView_Transactions_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void MenuItem_Transactions_OnClick(object sender, RoutedEventArgs e)
         {
-            var transactionViewModel = ListView_Transactions.SelectedItem as TransactionViewModel;
-            if (transactionViewModel == null)
-            {
-                throw new InvalidCastException();
-            }
-            // У чейна тот же айди, что и у транзакции
-            Chain chain = _chainStorage.GetEntity(transactionViewModel.Id);
-
-            var chainView = new ChainView(new ChainViewModel(chain));
-            chainView.Show();
+            IEnumerable<TransactionViewModel> transactions = Injector.Get<ITransactionStorage>()
+                .GetAll()
+                .Select(transaction => new TransactionViewModel(transaction));
+            var transactionWindow = new TransactionsWindow(transactions);
+            transactionWindow.Show();
         }
     }
 }

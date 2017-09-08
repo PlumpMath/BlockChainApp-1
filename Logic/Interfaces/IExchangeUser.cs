@@ -10,6 +10,7 @@ namespace Logic.Interfaces
     /// </summary>
     public interface IExchangeUser : IIdentificable
     {
+        int OwnedShareCount { get; }
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
@@ -45,7 +46,9 @@ namespace Logic.Interfaces
         /// </summary>
         void ChangeSharePriceIfWantTo(long companyId);
 
-        IEnumerable<Share> GetOwnedShares();
+        double MakeInvoiceOffer();
+
+        ICollection<Share> GetOwnedShares();
 
         ExchangeUserType GetExchangeUserType();
     }

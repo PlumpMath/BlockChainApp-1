@@ -5,5 +5,7 @@
         public string Name { get; set; }
 
         public string Wallet { get; set; }
+
+        public int OwnedSharesCount { get; set; }
     }
 }

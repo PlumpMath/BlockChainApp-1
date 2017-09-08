@@ -54,6 +54,7 @@
     <Compile Include="Fabrics\FabricBase.cs" />
     <Compile Include="Fabrics\ShareFabric.cs" />
     <Compile Include="Finance\Exchange.cs" />
+    <Compile Include="Finance\ExchangeStepResult.cs" />
     <Compile Include="Finance\Share.cs" />
     <Compile Include="Extensions\ShareExtensions.cs" />
     <Compile Include="Finance\ShareInvoiceInfo.cs" />

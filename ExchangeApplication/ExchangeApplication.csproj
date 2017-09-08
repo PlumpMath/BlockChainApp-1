@@ -56,10 +56,14 @@
     </ApplicationDefinition>
     <Compile Include="ViewModels\ChainViewModel.cs" />
     <Compile Include="ViewModels\CompanyListItemViewModel.cs" />
+    <Compile Include="ViewModels\ExchangeStepResultViewModel.cs" />
     <Compile Include="ViewModels\ExchangeUserViewModel.cs" />
     <Compile Include="ViewModels\TransactionViewModel.cs" />
     <Compile Include="Views\ChainView.xaml.cs">
       <DependentUpon>ChainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TransactionsWindow.xaml.cs">
+      <DependentUpon>TransactionsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -74,6 +78,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ChainView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TransactionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

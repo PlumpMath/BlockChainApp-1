@@ -46,8 +46,9 @@ namespace Logic.Finance
 
         public IEnumerable<IExchangeUser> GetExchangeUsers() => _exchangeUsers;
 
-        public void ExecuteExchanging()
+        public ExchangeStepResult ExecuteExchanging()
         {
+            var result = new ExchangeStepResult();
             foreach (IExchangeUser user in _exchangeUsers)
             {
                 
@@ -56,10 +57,15 @@ namespace Logic.Finance
                 if (buyer.WannaMissTurn())
                 {
                     // Если участник-покупатель не захотел торговать сейчас
-                    continue;
+                    //continue;
                 }
-                TryMakeDeal(buyer, seller);
+                ExchangeStepResult dealResult = TryMakeDeal(buyer, seller);
+                if (dealResult == null) continue;
+                result.StepDealSumm += dealResult.StepDealSumm;
+                result.StepDealBankComission += dealResult.StepDealBankComission;
+                result.StepDealCount++;
             }
+            return result.StepDealCount == 0 ? null : result;
         }
 
         /// <summary>
@@ -72,22 +78,26 @@ namespace Logic.Finance
             _observer?.CommonMessage(text);
         }
 
-        private void TryMakeDeal(IExchangeUser buyer, IExchangeUser seller)
+        private ExchangeStepResult TryMakeDeal(IExchangeUser buyer, IExchangeUser seller)
         {
-            IEnumerable<Share> sellerShares = seller.GetOwnedShares();
+            ICollection<Share> sellerShares = seller.GetOwnedShares();
             if (!sellerShares.Any())
             {
                 // если у продавца нет акций
-                return;
+                return null;
             }
 
-            ShareInvoiceInfo invoice = sellerShares.GetRandomShareInvoiceInfo();
+            ShareInvoiceInfo invoice = sellerShares.GetRandomShareInvoiceInfo(buyer.MakeInvoiceOffer());
+            if (invoice == null)
+            {
+                return null;
+            }
 
             if (!buyer.WannaBuyShares(invoice))
             {
                 // Если покупатель не захотел покупать акции по некоторой причине
                 seller.DecreaseSharePriceIfWantTo(invoice.CompanyId);
-                return;
+                return null;
             }
 
             seller.DeattachShares(invoice);
@@ -95,7 +105,16 @@ namespace Logic.Finance
             // Кол-во денег вычисляется рандомно
             // double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
 
-            _bank.TransferMoney(buyer, seller, invoice.Cost);
+            bool success = _bank.TransferMoney(buyer, seller, invoice.Cost, out double comission);
+
+            // Возвращается единичный результат, чтобы быть сложенным с остальными на уровень выше
+            if (!success) return null;
+            return new ExchangeStepResult
+            {
+                StepDealSumm = invoice.Cost,
+                StepDealBankComission = comission,
+                StepDealCount = 1
+            };
         }
 
         /// <summary>
