@@ -57,7 +57,7 @@ namespace Logic.Finance
                 if (buyer.WannaMissTurn())
                 {
                     // Если участник-покупатель не захотел торговать сейчас
-                    //continue;
+                    continue;
                 }
                 ExchangeStepResult dealResult = TryMakeDeal(buyer, seller);
                 if (dealResult == null) continue;
@@ -102,8 +102,6 @@ namespace Logic.Finance
 
             seller.DeattachShares(invoice);
             buyer.TakeShares(invoice);
-            // Кол-во денег вычисляется рандомно
-            // double invoice = MiscUtils.GetRandomNumber(MaxTransactionPrice);
 
             bool success = _bank.TransferMoney(buyer, seller, invoice.Cost, out double comission);
 

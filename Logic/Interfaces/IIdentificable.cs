@@ -5,10 +5,8 @@ namespace Logic.Interfaces
     /// <summary>
     /// Объект, который может быть идентифицируем
     /// </summary>
-    public interface IIdentificable
+    public interface IIdentificable : IId
     {
-        long Id { get; set;  }
-
         string UniqueExchangeId();
 
         /// <summary>
@@ -17,5 +15,10 @@ namespace Logic.Interfaces
         string Name { get; set; }
 
         DateTime CreatedAt { get; }
+    }
+
+    public interface IId
+    {
+        long Id { get; set; }
     }
 }

@@ -7,7 +7,7 @@ using Logic.Participants;
 namespace Logic.Storages
 {
     public class EntityMemoryStorageBase<TEntity> : IEntityStorage<TEntity>
-        where TEntity : class, IIdentificable
+        where TEntity : class, IId
     {
         private readonly List<TEntity> _list;
 
@@ -50,9 +50,6 @@ namespace Logic.Storages
         {
             Save(entities.ToArray());
         }
-
-        public TEntity GetEntity(string uniqueId)
-            => GetAll().SingleOrDefault(item => item.UniqueExchangeId() == uniqueId);
 
         public virtual TEntity GetLastEntity() 
             => GetAll().Last();

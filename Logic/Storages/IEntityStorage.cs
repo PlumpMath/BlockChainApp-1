@@ -6,7 +6,7 @@ namespace Logic.Storages
     /// <summary>
     /// Хранилище для некоторой сущности
     /// </summary>
-    public interface IEntityStorage<TEntity> where TEntity : class, IIdentificable
+    public interface IEntityStorage<TEntity> where TEntity : class, IId
     {
         void Save(TEntity entity);
 
@@ -15,8 +15,6 @@ namespace Logic.Storages
         void Save(IEnumerable<TEntity> entities);
 
         TEntity GetEntity(long id);
-
-        TEntity GetEntity(string uniqueId);
 
         TEntity GetLastEntity();
 

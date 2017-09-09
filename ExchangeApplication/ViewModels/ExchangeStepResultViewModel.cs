@@ -1,4 +1,5 @@
 ﻿using Logic.Finance;
+using Utilities.Common;
 
 namespace ExchangeApplication.ViewModels
 {
@@ -6,17 +7,17 @@ namespace ExchangeApplication.ViewModels
     {
         public long ExchangeStep { get; set; }
 
-        public double StepDealMoneySumm { get; set; }
+        public string StepDealMoneySumm { get; set; }
 
-        public double StepDealBankComission { get; set; }
+        public string StepDealBankComission { get; set; }
 
         public int StepDealCount { get; set; }
 
         public ExchangeStepResultViewModel(ExchangeStepResult result, long step)
         {
             ExchangeStep = step;
-            StepDealMoneySumm = result.StepDealSumm;
-            StepDealBankComission = result.StepDealBankComission;
+            StepDealMoneySumm = MiscUtils.FormatDouble(result.StepDealSumm);
+            StepDealBankComission = MiscUtils.FormatDouble(result.StepDealBankComission);
             StepDealCount = result.StepDealCount;
         }
     }

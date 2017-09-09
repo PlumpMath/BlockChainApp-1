@@ -18,8 +18,8 @@ namespace ExchangeApplication.ViewModels
             ReceiverUniqueId = chain.ReceiverUniqueId;
 
             IExchangeUserStorage storage = Injector.Get<IExchangeUserStorage>();
-            var sellerName = storage.GetEntity(SenderUniqueId).Name;
-            var buyerName = storage.GetEntity(ReceiverUniqueId).Name;
+            var sellerName = storage.GetExchangeUserByUniqueId(SenderUniqueId).Name;
+            var buyerName = storage.GetExchangeUserByUniqueId(ReceiverUniqueId).Name;
             SenderName = sellerName;
             ReceiverName = buyerName;
             

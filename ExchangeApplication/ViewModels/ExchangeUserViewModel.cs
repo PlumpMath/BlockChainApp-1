@@ -7,5 +7,7 @@
         public string Wallet { get; set; }
 
         public int OwnedSharesCount { get; set; }
+
+        public string OwnedSharesCost { get; set; }
     }
 }

@@ -10,7 +10,20 @@ namespace Logic.Finance
 
         public string Name { get; set; }
 
-        public double CurrentPrice { get; set; }
+        private double _currentprice = 1;
+        public double CurrentPrice
+        {
+            get => _currentprice;
+            set
+            {
+                if (value <= 1)
+                {
+                    // Минимальная цена акции не может быть ниже 1
+                    value = 1;
+                }
+                _currentprice = value;
+            }
+        }
 
         public double BasePrice { get; set; }
 

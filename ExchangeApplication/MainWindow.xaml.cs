@@ -66,7 +66,7 @@ namespace ExchangeApplication
 
             _exchangeTimer = new DispatcherTimer
             {
-                Interval = TimeSpan.FromMilliseconds(150)
+                Interval = TimeSpan.FromMilliseconds(300)
             };
             _exchangeTimer.Tick += _exchangeTimer_Tick;
         }

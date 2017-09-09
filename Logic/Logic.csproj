@@ -59,6 +59,7 @@
     <Compile Include="Extensions\ShareExtensions.cs" />
     <Compile Include="Finance\ShareInvoiceInfo.cs" />
     <Compile Include="Helpers\ExchangeUserType.cs" />
+    <Compile Include="Helpers\OwnedShareRepoController.cs" />
     <Compile Include="Helpers\SharePriceChangingType.cs" />
     <Compile Include="Interfaces\IHasExchangeuser.cs" />
     <Compile Include="Participants\Company.cs" />

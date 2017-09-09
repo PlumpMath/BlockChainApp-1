@@ -33,8 +33,8 @@ namespace ExchangeApplication.ViewModels
             ReceiverUniqueId = transaction.ReceiverUniqueId;
 
             IExchangeUserStorage storage = Injector.Get<IExchangeUserStorage>();
-            var senderName = storage.GetEntity(SenderUniqueId).Name;
-            var receiverName = storage.GetEntity(ReceiverUniqueId).Name;
+            var senderName = storage.GetExchangeUserByUniqueId(SenderUniqueId).Name;
+            var receiverName = storage.GetExchangeUserByUniqueId(ReceiverUniqueId).Name;
 
             SenderName = senderName;
             ReceiverName = receiverName;

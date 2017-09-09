@@ -1,4 +1,5 @@
-﻿using Logic.Bank;
+﻿using System.Linq;
+using Logic.Bank;
 using Logic.DependencyInjector;
 using Logic.Interfaces;
 using Logic.Participants;
@@ -16,7 +17,13 @@ namespace Logic.Storages
             }
             return base.GetEntity(id);
         }
+
+        public ExchangeUserBase GetExchangeUserByUniqueId(string uniqueId)
+            => GetAll().SingleOrDefault(item => item.UniqueExchangeId() == uniqueId);
     }
 
-    public interface IExchangeUserStorage : IEntityStorage<ExchangeUserBase> { }
+    public interface IExchangeUserStorage : IEntityStorage<ExchangeUserBase>
+    {
+        ExchangeUserBase GetExchangeUserByUniqueId(string uniqueId);
+    }
 }

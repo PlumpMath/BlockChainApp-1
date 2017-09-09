@@ -25,6 +25,15 @@ namespace Logic.Participants
 
         public abstract string UniqueExchangeId();
 
+        private readonly Dictionary<long, int> _companyIdSHareSellDenyCountDictironary;
+
+        protected ExchangeUserBase()
+        {
+            Id = 0;
+            CreatedAt = DateTime.UtcNow;
+            _companyIdSHareSellDenyCountDictironary = new Dictionary<long, int>();
+        }
+
         /// <summary>
         /// Получение списка акций, принадлежащих пользователю
         /// </summary>
@@ -37,17 +46,22 @@ namespace Logic.Participants
                 : shares;
         }
 
-        public int OwnedShareCount
-        {
-            get { return GetMineShares().Count(); }
-        }
+        public int OwnedShareCount => GetMineShares().Count();
 
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
         public virtual bool WannaMissTurn()
         {
-            return MakeRandomDecision(70);
+            int riskness = GetCurrentRiskness();
+            if (OwnedShareCount == 0)
+            {
+                riskness += 20;
+            } else if (OwnedShareCount > 100)
+            {
+                riskness -= 40;
+            }
+            return MakeRandomDecision(riskness);
         }
 
         public bool WannaBuyShares(ShareInvoiceInfo invoice)
@@ -64,7 +78,7 @@ namespace Logic.Participants
                 // Если на счету останется меньше 20% после сделки, то тоже отказываемся
                 return false;
             }
-            int riskness = MiscUtils.GetRandomNumber(100, 40);
+            int riskness = GetCurrentRiskness();
             if (invoice.Trand == SharePriceChangingType.Increasing)
             {
                 riskness += 10;
@@ -72,6 +86,14 @@ namespace Logic.Participants
             else if (invoice.Trand == SharePriceChangingType.Decreasing)
             {
                 riskness -= 10;
+            }
+
+            Share share = invoice.Shares.First();
+
+            if (share.CurrentPrice / share.BasePrice > 1.5)
+            {
+                // расскомментирование приводит к образованию пузырей
+                // riskness += 20;
             }
             return MakeRandomDecision(riskness);
         }
@@ -135,24 +157,24 @@ namespace Logic.Participants
 
         public double MakeInvoiceOffer()
         {
-            const double MaxCouldSpendRate = 0.8;
+            const double maxCouldSpendRate = 0.8;
             double mineMoney = this.GetBankAccountValue();
-            return mineMoney * MaxCouldSpendRate;
+            return mineMoney * maxCouldSpendRate;
         }
 
         private void ChangeSharePriceIfWantTo(long companyId, SharePriceChangingType sharePriceChangingType)
         {
-            IEnumerable<Share> mineShares = GetMineShares(companyId);
+            ICollection<Share> mineShares = GetMineShares(companyId);
             if (!WannaChangeAPrice(mineShares, out double? changeRate))
             {
                 // Если нет хочет/может повысить цену на акции
-                //sharePriceChangingType = SharePriceChangingType.Fixed;
-                return;
+                sharePriceChangingType = SharePriceChangingType.Fixed;
+                // return;
             }
             Injector.Get<IShareStorage>().ChangeShareCurrentPrice(companyId, changeRate ?? 0, sharePriceChangingType);
         }
 
-        private bool WannaChangeAPrice(IEnumerable<Share> mineShares, out double? changeRate)
+        private bool WannaChangeAPrice(ICollection<Share> mineShares, out double? changeRate)
         {
             // Раздумье, стоит ли повысить цену на акции, если остались в наличии
             if (!MakeRandomDecision() && mineShares.Any())
@@ -165,30 +187,26 @@ namespace Logic.Participants
             return true;
         }
 
-        public ICollection<Share> GetOwnedShares()
-        {
-            return GetMineShares();
-        }
+        public ICollection<Share> GetOwnedShares() => GetMineShares();
 
         public abstract ExchangeUserType GetExchangeUserType();
 
-        protected ExchangeUserBase()
-        {
-            Id = 0;
-            CreatedAt = DateTime.UtcNow;
-        }
-
-        public override string ToString()
-        {
-            return $"{Name}, UniqueId {UniqueExchangeId()}";
-        }
+        public override string ToString() => $"{Name}, UniqueId {UniqueExchangeId()}";
 
         private bool MakeRandomDecision(int riskness = 50)
         {
             const int maxLevel = 100;
+            riskness = riskness.CorrectRiskness();
+
+            // нижний уровень желания, после которого юзер не соглашается
             int lowLevel = maxLevel - riskness;
             var rand = MiscUtils.GetRandomNumber(maxLevel);
             return rand >= lowLevel;
+        }
+
+        private int GetCurrentRiskness()
+        {
+            return MiscUtils.GetRandomNumber(90, 10);
         }
     }
 }
