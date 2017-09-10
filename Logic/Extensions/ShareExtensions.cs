@@ -1,78 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Logic.Bank;
+using Logic.DependencyInjector;
 using Logic.Finance;
 using Logic.Helpers;
+using Logic.Interfaces;
+using Logic.Participants;
 using Utilities.Common;
 
 namespace Logic.Extensions
 {
     public static class ShareExtensions
     {
-        public static ICollection<Share> GetSharesOfOneRandomCompany(this ICollection<Share> shares, out long outCompanyId)
+        public static double GetBankAccountValue(this IExchangeUser user)
         {
-            IEnumerable<long> companyIds = shares
-                .Select(share => share.CompanyId)
-                .Distinct();
-            int count = companyIds.Count();
-            
-            int randomIndex = MiscUtils.GetRandomNumber(count);
-            long companyId = companyIds.ElementAt(randomIndex);
-            outCompanyId = companyId;
-            return shares.Where(share => share.CompanyId == companyId).ToArray();
+            return GetBankAccount(user).AccountValue;
         }
 
-        public static ShareInvoiceInfo GetRandomShareInvoiceInfo(this ICollection<Share> shares, double invoiceOffer)
+        public static bool GotEnoughMoney(this IExchangeUser user, double invoice)
         {
-            // Взятие акций одной компании
-            shares = shares.GetSharesOfOneRandomCompany(out long companyId);
-            int shareForSaleCount = shares.Count();
-            double currentPrice = shares.First().CurrentPrice;
+            return GetBankAccount(user).AccountValue >= invoice;
+        }
 
-            double allSharesCost = currentPrice * shareForSaleCount;
+        public static BankAccount GetBankAccount(this IExchangeUser user)
+        {
+            return Injector.Get<IBank>().GetBankAccount(user.UniqueExchangeId());
+        }
 
-            if (allSharesCost > invoiceOffer)
-            {
-                int couldBuyCount = (int)Math.Floor(invoiceOffer / currentPrice);
-
-                if (couldBuyCount == 0)
-                {
-                    return null;
-                }
-                shares = shares.Take(couldBuyCount).ToArray();
-            }        
-
-            // вычисление общей стоимости акций на основе текущей цены
-            double invoice = shares.GetSharesCost();
-
-            var shareInvoiceInfo = new ShareInvoiceInfo
-            {
-                Shares = shares,
-                CompanyId = companyId,
-                Count = shareForSaleCount,
-                Cost = invoice,
-                Trand = shares.First().PriceChangingTrand
-            };
-
-            return shareInvoiceInfo;
+        public static IExchangeUser GetOwnerByBankAccount(this BankAccount account)
+        {
+            return Injector.Get<IBank>().GetOwnerByBankAccount(account.UniqueUserId);
         }
 
         public static double GetSharesCost(this IEnumerable<Share> shares)
         {
-            return shares.Count() * shares.First().CurrentPrice;
+            return !shares.Any() 
+                ? 0
+                : shares.Count() * shares.First().CurrentPrice;
         }
-    }
 
-    public static class ShareHelpers
-    {
-        public static SharePriceChangingType GetPriceChangingTypeByRandom()
+        public static double CalculatePriceChangePercent(this Company company)
         {
-            IEnumerable<SharePriceChangingType> values = Enum
-                .GetValues(typeof(SharePriceChangingType))
-                .OfType<SharePriceChangingType>();
+            double currentPrice = company.ShareCurrentPrice,
+                basePrice = company.ShareBasePrice;
 
-            int index = MiscUtils.GetRandomNumber(values.Count() - 1);
-            return values.ElementAt(index);
+            double percent = Math.Abs(currentPrice - basePrice) < 0.01
+                ? 0
+                : ((currentPrice - basePrice) / basePrice) * 100;
+
+            return percent;
+        }
+
+        public static Company GetCompanyWithMaxGrow(this ICollection<Company> companies)
+        {
+            double maxGrowPercent = companies.Max(c => c.CalculatePriceChangePercent());
+            return companies.First(c => Math.Abs(c.CalculatePriceChangePercent() - maxGrowPercent) < 0.001);
+        }
+
+        public static Company GetCompanyWithMinimalGrow(this ICollection<Company> companies)
+        {
+            double maxGrowPercent = companies.Min(c => c.CalculatePriceChangePercent());
+            return companies.First(c => Math.Abs(c.CalculatePriceChangePercent() - maxGrowPercent) < 0.001);
         }
     }
 }

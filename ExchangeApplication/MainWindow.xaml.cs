@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace ExchangeApplication
     /// </summary>
     public partial class MainWindow : Window, IObserver
     {
-        private readonly IExchange _exchange;
+        private readonly IPOExchangeInstitution _ipoExchangeInstitution;
 
         private readonly IBank _bank;
 
@@ -48,10 +49,10 @@ namespace ExchangeApplication
 
         private long _exchangeStepCount = 0;
 
-        public MainWindow(IExchange exchange)
+
+        public MainWindow(IPOExchangeInstitution ipoExchangeInstitution)
         {
-            _exchange = exchange;
-            _exchange.SetChainChangeListener(this);
+            _ipoExchangeInstitution = ipoExchangeInstitution;
 
             _bank = Injector.Get<IBank>();
             _bank.SetChainChangeListener(this);
@@ -60,7 +61,7 @@ namespace ExchangeApplication
             _transactionStorage = Injector.Get<ITransactionStorage>();
 
             InitializeComponent();
-            FillData();
+            FillExchangeUsersList();
             FillBaseData();
             FillCompanies();
 
@@ -69,79 +70,59 @@ namespace ExchangeApplication
                 Interval = TimeSpan.FromMilliseconds(300)
             };
             _exchangeTimer.Tick += _exchangeTimer_Tick;
+
+            _ipoExchangeInstitution.ExchangeStepExecuted += IpoExchangeInstitutionOnExchangeStepExecuted;
         }
 
-        private void _exchangeTimer_Tick(object sender, EventArgs e)
+        private void IpoExchangeInstitutionOnExchangeStepExecuted(ExchangeStepResult result)
         {
-            ExchangeStepResult stepResult = _exchange.ExecuteExchanging();
             _exchangeStepCount++;
+            FillExchangeUsersList();
+            FillBaseData();
+            FillCompanies();
+            if (result != null)
+            {
+                DisplayExchangeStepResult(new ExchangeStepResultViewModel(result, _exchangeStepCount));
+            }
 
+            // Выплаты по депоситам, если наступил рубеж
             if (_depositPayoutTickCount == DepositPayoutTick)
             {
-                _exchange.PayoutDepositPercents();
+                _bank.PayoutDepositPercent();
                 _depositPayoutTickCount = 1;
             }
             else
             {
                 _depositPayoutTickCount++;
             }
-
-            FillData();
-            FillBaseData();
-            FillCompanies();
-            if (stepResult != null) 
-            {
-                DisplayExchangeStepResult(new ExchangeStepResultViewModel(stepResult, _exchangeStepCount));
-            }
-            
         }
 
-        private void FillData()
+        private void _exchangeTimer_Tick(object sender, EventArgs e)
         {
-            ListView_Users.Items.Clear();
-            IEnumerable<IExchangeUser> users = _exchange
-                .GetExchangeUsers()
-                .OrderByDescending(u => u.GetBankAccountValue());
+            _ipoExchangeInstitution.ExecuteExchanging();
+        }
 
-            for (int i = 0; i < users.Count(); i++)
-            {
-                IExchangeUser user = users.ElementAt(i);
-                var model = new ExchangeUserViewModel
-                {
-                    Name = user.Name,
-                    Wallet = MiscUtils.FormatDouble(user.GetBankAccountValue()),
-                    OwnedSharesCount = user.OwnedShareCount
-                };
-                ListView_Users.Items.Add(model);
-            }
-            //---------------------
+        private void FillExchangeUsersList()
+        {
+            ListView_Users.ItemsSource = _ipoExchangeInstitution
+                .GetExchangeUsers()
+                .OrderByDescending(u => u.GetBankAccountValue())
+                .Select(user => new ExchangeUserViewModel(user));
         }
 
         private void FillBaseData()
         {
-            TextBlock_BankMoney.Text = MiscUtils.FormatDouble(Injector.Get<IBank>().GetMoneyAmount());
-            TextBlock_ShareCount.Text = Injector.Get<IShareStorage>().GetAll().Count().ToString();
+            TextBlock_BankMoney.Text = Injector.Get<IBank>().GetMoneyAmount().FormatDouble();
+            ICollection<Share> shares = Injector.Get<IShareStorage>().GetAll();
+            TextBlock_ShareCount.Text = shares.Count().ToString();
+            TextBlock_ShareCosts.Text = shares.GetSharesCost().FormatDouble();
         }
 
         private void FillCompanies()
         {
-            ListView_Companies.Items.Clear();
-            IEnumerable<Company> companies = Injector.Get<ICompanyStorage>().GetAll();
-
-            for (int i = 0; i < companies.Count(); i++)
-            {
-                Company company = companies.ElementAt(i);
-                var model = new CompanyListItemViewModel
-                {
-                    Name = company.Name,
-                    ShareCount = company.GetCompanyShareCount(),
-                    ShareBasePrice = MiscUtils.FormatDouble(company.GetCompanyShareBasePrice()),
-                    ShareCurrentPrice = MiscUtils.FormatDouble(company.GetCompanyShareCurrentPrice()),
-                    CompanyCost = MiscUtils.FormatDouble(company.GetCompanyCost()),
-                    PriceChangeTrand = company.GetCompanySharePriceChangingTrand()
-                };
-                ListView_Companies.Items.Add(model);
-            }
+            ListView_Companies.ItemsSource = Injector.Get<ICompanyStorage>()
+                .GetAll()
+                .Select(company => new CompanyListItemViewModel(company));
         }
 
         private void DisplayExchangeStepResult(ExchangeStepResultViewModel stepResultViewModel)

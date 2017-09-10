@@ -10,9 +10,9 @@ namespace Logic.Storages
 {
     public interface IShareStorage : IEntityStorage<Share>
     {
-        IEnumerable<Share> GetByCompanyId(long companyId);
+        ICollection<Share> GetByCompanyId(long companyId);
 
-        IEnumerable<Share> GetByOwnerId(string ownerUniqueId);
+        ICollection<Share> GetByOwnerId(string ownerUniqueId);
 
         void IncreaseShareCurrentPrice(long companyId, double additionRate);
 
@@ -23,14 +23,14 @@ namespace Logic.Storages
 
     public class ShareMemoryStorage : EntityMemoryStorageBase<Share>, IShareStorage
     {
-        public IEnumerable<Share> GetByCompanyId(long companyId)
+        public ICollection<Share> GetByCompanyId(long companyId)
         {
-            return GetAll().Where(share => share.CompanyId == companyId);
+            return GetAll().Where(share => share.CompanyId == companyId).ToArray();
         }
 
-        public IEnumerable<Share> GetByOwnerId(string ownerUniqueId)
+        public ICollection<Share> GetByOwnerId(string ownerUniqueId)
         {
-            return GetAll().Where(share => share.OwnerUniqueId == ownerUniqueId);
+            return GetAll().Where(share => share.OwnerUniqueId == ownerUniqueId).ToArray();
         }
 
         public void IncreaseShareCurrentPrice(long companyId, double additionRate)

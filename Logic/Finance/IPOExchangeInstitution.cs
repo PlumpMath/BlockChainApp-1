@@ -15,7 +15,7 @@ using Utilities.Convert;
 
 namespace Logic.Finance
 {
-    public class Exchange : IExchange
+    public class IPOExchangeInstitution
     {
         private static readonly double MaxTransactionPrice
             = ConfigurationManager.AppSettings["MaxTransactionPrice"].ParseAsDouble();
@@ -32,9 +32,14 @@ namespace Logic.Finance
         /// </summary>
         private readonly IBank _bank;
 
-        private IObserver _observer;
+        public delegate void IPOExchangeStepExecuted(ExchangeStepResult result);
 
-        public Exchange(IBank bank, IEnumerable<IExchangeUser> users, IEnumerable<Company> companies)
+        /// <summary>
+        /// Событие, происходящее по исполнению торгов
+        /// </summary>
+        public event IPOExchangeStepExecuted ExchangeStepExecuted;
+
+        public IPOExchangeInstitution(IBank bank, IEnumerable<IExchangeUser> users, IEnumerable<Company> companies)
         {
             _bank = bank;
             _exchangeUsers = new List<IExchangeUser>();
@@ -46,7 +51,7 @@ namespace Logic.Finance
 
         public IEnumerable<IExchangeUser> GetExchangeUsers() => _exchangeUsers;
 
-        public ExchangeStepResult ExecuteExchanging()
+        public void ExecuteExchanging()
         {
             var result = new ExchangeStepResult();
             foreach (IExchangeUser user in _exchangeUsers)
@@ -59,60 +64,45 @@ namespace Logic.Finance
                     // Если участник-покупатель не захотел торговать сейчас
                     continue;
                 }
-                ExchangeStepResult dealResult = TryMakeDeal(buyer, seller);
-                if (dealResult == null) continue;
-                result.StepDealSumm += dealResult.StepDealSumm;
-                result.StepDealBankComission += dealResult.StepDealBankComission;
+                if (!TryMakeDeal(buyer, seller, out ShareInvoiceInfo invoice))
+                {
+                    continue;
+                }
+                result.StepDealSumm += invoice.Cost;
+                result.StepDealBankComission += invoice.Comission;
                 result.StepDealCount++;
             }
-            return result.StepDealCount == 0 ? null : result;
-        }
-
-        /// <summary>
-        /// Выплата процентов по депозитам
-        /// </summary>
-        public void PayoutDepositPercents()
-        {
-            double allPercents = _bank.PayoutDepositPercent();
-            var text = $"Выплачены проценты по депозитам {MiscUtils.FormatDouble(allPercents)}";
-            _observer?.CommonMessage(text);
-        }
-
-        private ExchangeStepResult TryMakeDeal(IExchangeUser buyer, IExchangeUser seller)
-        {
-            ICollection<Share> sellerShares = seller.GetOwnedShares();
-            if (!sellerShares.Any())
+            if (result.StepDealCount != 0)
             {
-                // если у продавца нет акций
-                return null;
+                // Если сделка состоялась, то сообщаем слушателям
+                ExchangeStepExecuted?.Invoke(result);
             }
+        }
 
-            ShareInvoiceInfo invoice = sellerShares.GetRandomShareInvoiceInfo(buyer.MakeInvoiceOffer());
-            if (invoice == null)
+        private bool TryMakeDeal(IExchangeUser buyer, IExchangeUser seller, out ShareInvoiceInfo invoice)
+        {
+            if (!seller.WannaSellShares(buyer.MakeInvoiceOffer(), out invoice))
             {
-                return null;
+                return false;
             }
 
             if (!buyer.WannaBuyShares(invoice))
             {
                 // Если покупатель не захотел покупать акции по некоторой причине
                 seller.DecreaseSharePriceIfWantTo(invoice.CompanyId);
-                return null;
+                return false;
             }
 
             seller.DeattachShares(invoice);
             buyer.TakeShares(invoice);
 
-            bool success = _bank.TransferMoney(buyer, seller, invoice.Cost, out double comission);
-
-            // Возвращается единичный результат, чтобы быть сложенным с остальными на уровень выше
-            if (!success) return null;
-            return new ExchangeStepResult
+            if (!_bank.TransferMoney(buyer, seller, invoice.Cost, out double comission))
             {
-                StepDealSumm = invoice.Cost,
-                StepDealBankComission = comission,
-                StepDealCount = 1
-            };
+                // Если по какой-то причине не получилось трансферинга денег
+                return false;
+            }
+            invoice.Comission = comission;
+            return true;
         }
 
         /// <summary>
@@ -123,14 +113,6 @@ namespace Logic.Finance
             return _exchangeUsers
                 .Where(user => user.Id != excludeId)
                 .GetRandomEntity();
-        }
-
-        /// <summary>
-        /// Сложно передавать в конструктор
-        /// </summary>
-        public void SetChainChangeListener(IObserver listener)
-        {
-            _observer = listener;
         }
     }
 }

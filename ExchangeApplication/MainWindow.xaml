@@ -5,14 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExchangeApplication"
         mc:Ignorable="d"
-        Title="Фондовая Биржа" Height="908" Width="1738.5" WindowStartupLocation="CenterScreen">
+        Title="Фондовая Биржа" Height="908" Width="1528.5" WindowStartupLocation="CenterScreen">
     <Grid>
-        <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="479*"/>
+            <RowDefinition Height="399*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="352*"/>
-                <ColumnDefinition Width="615*"/>
-                <ColumnDefinition Width="394*"/>
-                <ColumnDefinition Width="369*"/>
+                <ColumnDefinition Width="339*"/>
+                <ColumnDefinition Width="576*"/>
+                <ColumnDefinition Width="425*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="42"/>
@@ -20,7 +23,7 @@
                 <RowDefinition Height="45*"/>
                 <RowDefinition Height="43"/>
             </Grid.RowDefinitions>
-            <ListView x:Name="ListView_Users" Grid.Column="2" Grid.Row="1" Margin="10,37,10,10" Grid.RowSpan="2">
+            <ListView x:Name="ListView_Users" Grid.Column="1" Grid.Row="2" Margin="10,41,10,10">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Имя">
@@ -30,7 +33,7 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Состояние счета">
+                        <GridViewColumn Header="Счет">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Wallet}" HorizontalAlignment="Stretch" />
@@ -46,7 +49,7 @@
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
 
-                        <GridViewColumn Header="Капитализация акций">
+                        <GridViewColumn Header="Активы в акциях">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding OwnedSharesCost}" HorizontalAlignment="Stretch" />
@@ -56,11 +59,11 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <Label Content="Участники биржи" Grid.Column="2" Margin="10,6,10,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Grid.ColumnSpan="2"/>
+            <Label Content="Участники биржи" Grid.Column="1" Margin="10,10,231,0" Grid.Row="2" VerticalAlignment="Top" Height="26"/>
             <Label Content="Кол-во денег в обращении" Grid.Column="2" HorizontalAlignment="Left" Margin="10,5,0,12" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
-            <TextBlock x:Name="TextBlock_BankMoney" Grid.Column="2" Margin="179,10,72,15" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
-            <TextBox Margin="10,41,10,10" Grid.Row="1" TextWrapping="Wrap" Text="" Name="TextBox_Log" Grid.Column="3" Grid.RowSpan="2"/>
-            <Label Content="События биржи" Margin="10,7,10,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Grid.Column="3"/>
+            <TextBlock x:Name="TextBlock_BankMoney" Grid.Column="2" Margin="179,10,441,15" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
+            <TextBox Margin="10,41,10,10" Grid.Row="2" TextWrapping="Wrap" Text="" Name="TextBox_Log" Grid.Column="2"/>
+            <Label Content="События биржи" Margin="10,10,10,0" Grid.Row="2" VerticalAlignment="Top" Height="26" Grid.Column="2"/>
             <ListView x:Name="ListView_TransactionsSummary" Margin="10,41,10,10" Grid.Row="1" Grid.RowSpan="2">
                 <ListView.View>
                     <GridView>
@@ -99,7 +102,7 @@
                 </ListView.View>
             </ListView>
             <Label Content="Транзакции биржи" Margin="10,10,10,0" Grid.Row="1" VerticalAlignment="Top" Height="26"/>
-            <ListView x:Name="ListView_Companies" Grid.Column="1" Grid.Row="1" Margin="10,37,10,10" Grid.RowSpan="2">
+            <ListView x:Name="ListView_Companies" Grid.Column="1" Grid.Row="1" Margin="10,37,10,10" Grid.ColumnSpan="2">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Название">
@@ -145,17 +148,28 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
+
+                        <GridViewColumn Header="Прирост в процентах">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding PriceChangeInPercents}" HorizontalAlignment="Stretch" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        
                     </GridView>
                 </ListView.View>
             </ListView>
             <Label Content="Компании на бирже" Grid.Column="1" Margin="10,6,10,0" Grid.Row="1" VerticalAlignment="Top" Height="26"/>
-            <Menu Grid.ColumnSpan="4">
+            <Menu Grid.ColumnSpan="3">
                 <MenuItem Header="Начать торги" Height="42" Name="MenuItem_StartStopExchange" Click="StartStopExchangeProcess" Padding="5px"/>
                 <MenuItem Header="Транзакции" Name="MenuItem_Transactions" Click="MenuItem_Transactions_OnClick" />
             </Menu>
-            <DockPanel LastChildFill="False" Grid.Row="3" Grid.ColumnSpan="4" Background="#FFD4D4D4"/>
-            <Label Content="Кол-во денег в обращении" Grid.Column="1" HorizontalAlignment="Left" Margin="8,8,0,9" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
-            <TextBlock x:Name="TextBlock_ShareCount" Grid.Column="1" Margin="177,13,116,12" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
+            <DockPanel LastChildFill="False" Grid.Row="3" Grid.ColumnSpan="3" Background="#FFD4D4D4"/>
+            <Label Content="Акции в обращении" Grid.Column="1" HorizontalAlignment="Left" Margin="8,8,0,9" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
+            <TextBlock x:Name="TextBlock_ShareCount" Grid.Column="1" Margin="177,13,357,12" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
+            <Label Content="Общ стоимость акций" Grid.Column="1" HorizontalAlignment="Left" Margin="355,8,0,9" Width="169" Grid.Row="3" Panel.ZIndex="1"/>
+            <TextBlock x:Name="TextBlock_ShareCosts" Grid.Column="1" Margin="524,13,10,12" TextWrapping="Wrap" Text="0" Grid.Row="3" Panel.ZIndex="1"/>
         </Grid>
 
     </Grid>

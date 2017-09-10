@@ -18,6 +18,6 @@ namespace Logic.Storages
 
         TEntity GetLastEntity();
 
-        IEnumerable<TEntity> GetAll();
+        ICollection<TEntity> GetAll();
     }
 }

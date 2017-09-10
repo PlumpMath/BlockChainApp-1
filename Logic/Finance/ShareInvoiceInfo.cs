@@ -13,6 +13,8 @@ namespace Logic.Finance
 
         public double Cost { get; set; }
 
+        public double Comission { get; set; }
+
         public SharePriceChangingType Trand { get; set; }
     }
 }

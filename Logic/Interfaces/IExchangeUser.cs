@@ -22,6 +22,11 @@ namespace Logic.Interfaces
         bool WannaBuyShares(ShareInvoiceInfo invoice);
 
         /// <summary>
+        /// Хочет ли участник продавать свои акции
+        /// </summary>
+        bool WannaSellShares(double offer, out ShareInvoiceInfo invoice); 
+
+        /// <summary>
         /// Отчуждение акций, которые были куплены другим участником в результате сделки
         /// </summary>
         void DeattachShares(ShareInvoiceInfo invoice);
@@ -40,11 +45,6 @@ namespace Logic.Interfaces
         /// Пользователь может повысить стоимость акций определенной компании, которые у него есть
         /// </summary>
         void IncreaseSharePriceIfWantTo(long companyId);
-
-        /// <summary>
-        /// В завимости от рандома пользователь может или повысить, или понизить стоимость
-        /// </summary>
-        void ChangeSharePriceIfWantTo(long companyId);
 
         double MakeInvoiceOffer();
 

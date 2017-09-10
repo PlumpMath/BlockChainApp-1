@@ -35,9 +35,9 @@ namespace ExchangeApplication
                 .Concat(companies
                     .Select(company => (ExchangeUserBase)company.GetExchangeUser())));
 
-            IExchange exchange = CreateExchange(users, companies);
+            IPOExchangeInstitution ipoExchangeInstitution = CreateExchange(users, companies);
 
-            MainWindow mainWindow = new MainWindow(exchange);
+            MainWindow mainWindow = new MainWindow(ipoExchangeInstitution);
             mainWindow.Show();
         }
 
@@ -58,7 +58,7 @@ namespace ExchangeApplication
             return companies;
         }
 
-        private IExchange CreateExchange(IEnumerable<IndividualUser> users, IEnumerable<Company> companies)
+        private IPOExchangeInstitution CreateExchange(IEnumerable<IndividualUser> users, IEnumerable<Company> companies)
         {
             IBank bank = Injector.Get<IBank>();
 
@@ -74,7 +74,7 @@ namespace ExchangeApplication
             exchangeUsers.Add(bank.GetExchangeUser());
             Injector.Get<IExchangeUserStorage>().Save((ExchangeUserBase)bank.GetExchangeUser());
 
-            var exchange = new Exchange(bank, exchangeUsers, companies);
+            var exchange = new IPOExchangeInstitution(bank, exchangeUsers, companies);
             return exchange;
         }
     }

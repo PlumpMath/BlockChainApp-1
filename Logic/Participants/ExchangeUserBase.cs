@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Logic.DependencyInjector;
@@ -14,8 +15,8 @@ namespace Logic.Participants
 {
     public abstract class ExchangeUserBase : IExchangeUser
     {
-        public static double MaxIncreaseDecreaseRate = 0.1;
-        public static double MinIncreaseDecreaseRate = 0.01;
+        public static double MaxIncreaseDecreaseRate = 0.01;
+        public static double MinIncreaseDecreaseRate = 0.005;
 
         public long Id { get; set; }
 
@@ -25,13 +26,13 @@ namespace Logic.Participants
 
         public abstract string UniqueExchangeId();
 
-        private readonly Dictionary<long, int> _companyIdSHareSellDenyCountDictironary;
+        private readonly OwnedShareRepoController _ownedShareRepoController;
 
         protected ExchangeUserBase()
         {
             Id = 0;
             CreatedAt = DateTime.UtcNow;
-            _companyIdSHareSellDenyCountDictironary = new Dictionary<long, int>();
+            _ownedShareRepoController = new OwnedShareRepoController();
         }
 
         /// <summary>
@@ -98,6 +99,55 @@ namespace Logic.Participants
             return MakeRandomDecision(riskness);
         }
 
+        public bool WannaSellShares(double offer, out ShareInvoiceInfo invoice)
+        {
+            ICollection<Share> mineShares = GetMineShares();
+            if (!mineShares.Any())
+            {
+                // если у продавца нет акций
+                invoice = null;
+                return false;
+            }
+
+            invoice = GetRandomShareInvoiceInfo(mineShares, offer);
+            return invoice != null;
+        }
+
+        public ShareInvoiceInfo GetRandomShareInvoiceInfo(ICollection<Share> shares, double invoiceOffer)
+        {
+            // Взятие акций одной компании
+            shares = ChooseCompanyAndReturnShares(shares, out long companyId);
+            int shareForSaleCount = shares.Count();
+            double currentPrice = shares.First().CurrentPrice;
+
+            double allSharesCost = currentPrice * shareForSaleCount;
+
+            if (allSharesCost > invoiceOffer)
+            {
+                int couldBuyCount = (int)Math.Floor(invoiceOffer / currentPrice);
+
+                if (couldBuyCount == 0)
+                {
+                    return null;
+                }
+                shares = shares.Take(couldBuyCount).ToArray();
+            }
+
+            // вычисление общей стоимости акций на основе текущей цены
+            double invoice = shares.GetSharesCost();
+
+            var shareInvoiceInfo = new ShareInvoiceInfo
+            {
+                Shares = shares,
+                CompanyId = companyId,
+                Count = shareForSaleCount,
+                Cost = invoice,
+                Trand = shares.First().PriceChangingTrand
+            };
+
+            return shareInvoiceInfo;
+        }
+
         public void DeattachShares(ShareInvoiceInfo invoice)
         {
             if (invoice.Shares.Any(share => share.OwnerUniqueId != UniqueExchangeId()))
@@ -148,11 +198,6 @@ namespace Logic.Participants
         public void IncreaseSharePriceIfWantTo(long companyId)
         {
             ChangeSharePriceIfWantTo(companyId, SharePriceChangingType.Increasing);
-        }
-
-        public void ChangeSharePriceIfWantTo(long companyId)
-        {
-            ChangeSharePriceIfWantTo(companyId, ShareHelpers.GetPriceChangingTypeByRandom());
         }
 
         public double MakeInvoiceOffer()
@@ -207,6 +252,52 @@ namespace Logic.Participants
         private int GetCurrentRiskness()
         {
             return MiscUtils.GetRandomNumber(90, 10);
+        }
+
+        /// <summary>
+        /// Выбирает компанию, акции которой хочет продать, на основе имеющихся акций
+        /// </summary>
+        private ICollection<Share> ChooseCompanyAndReturnShares(ICollection<Share> shares, out long outCompanyId)
+        {
+            // Получение всех айдишников компаний, акции которых юзер имеет
+            ICollection<long> companyIds = shares
+                .Select(share => share.CompanyId)
+                .Distinct()
+                .ToArray();
+            ICollection<Company> companies = companyIds
+                .Select(id => Injector.Get<ICompanyStorage>().GetEntity(id))
+                .ToArray();
+
+            // Нахождение компании с отрицательным ростом, чтобы продать
+            Company companyWithMinGrow = companies.GetCompanyWithMinimalGrow();
+            if (companyWithMinGrow.CalculatePriceChangePercent() <= -10)
+            {
+                // Продаем акции, у которых прибыльность упала на 10%
+                outCompanyId = companyWithMinGrow.Id;
+                return shares
+                    .Where(share => share.CompanyId == companyWithMinGrow.Id)
+                    .ToArray();
+            }
+
+            // Нахождение максимального числа капитализации
+            Company maxGrowCompany = companies
+                .GetCompanyWithMaxGrow();
+
+            if (maxGrowCompany.CalculatePriceChangePercent() >= 5)
+            {
+                // Продаем акции, у которых прибыльность выросла на 5%
+                outCompanyId = maxGrowCompany.Id;
+                return shares
+                    .Where(share => share.CompanyId == maxGrowCompany.Id)
+                    .ToArray();
+            }
+
+            int count = companyIds.Count;
+
+            int randomIndex = MiscUtils.GetRandomNumber(count);
+            long companyId = companyIds.ElementAt(randomIndex);
+            outCompanyId = companyId;
+            return shares.Where(share => share.CompanyId == companyId).ToArray();
         }
     }
 }

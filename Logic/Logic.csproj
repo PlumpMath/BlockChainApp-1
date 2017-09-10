@@ -53,7 +53,7 @@
     <Compile Include="Fabrics\CompanyFabric.cs" />
     <Compile Include="Fabrics\FabricBase.cs" />
     <Compile Include="Fabrics\ShareFabric.cs" />
-    <Compile Include="Finance\Exchange.cs" />
+    <Compile Include="Finance\IPOExchangeInstitution.cs" />
     <Compile Include="Finance\ExchangeStepResult.cs" />
     <Compile Include="Finance\Share.cs" />
     <Compile Include="Extensions\ShareExtensions.cs" />
@@ -70,12 +70,10 @@
     <Compile Include="Bank\CentralBank.cs" />
     <Compile Include="Exceptions\BankMoneyDefaultException.cs" />
     <Compile Include="Exceptions\ExchangeUserDefaultException.cs" />
-    <Compile Include="Extensions\BankExtensions.cs" />
     <Compile Include="Fabrics\IFabricBase.cs" />
     <Compile Include="Fabrics\IndividualUserFabric.cs" />
     <Compile Include="Interfaces\IBank.cs" />
     <Compile Include="Observation\IObserver.cs" />
-    <Compile Include="Interfaces\IExchange.cs" />
     <Compile Include="Interfaces\IExchangeUser.cs" />
     <Compile Include="Observation\IObserverable.cs" />
     <Compile Include="Storages\ChainMemoryStorage.cs" />

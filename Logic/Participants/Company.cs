@@ -44,37 +44,23 @@ namespace Logic.Participants
             return nameof(Company).ToLowerInvariant() + this.Id;
         }
 
-        public IEnumerable<Share> GetCompanyShares()
+        public ICollection<Share> GetCompanyShares()
         {
             return Injector.Get<IShareStorage>().GetByCompanyId(this.Id);
         }
 
-        public int GetCompanyShareCount()
-        {
-            return GetCompanyShares().Count();
-        }
+        public int ShareCount => GetCompanyShares().Count();
 
-        public double GetCompanyShareBasePrice()
-        {
-            return GetCompanyShares().First().BasePrice;
-        }
+        public double ShareBasePrice => GetCompanyShares().First().BasePrice;
 
-        public double GetCompanyShareCurrentPrice()
-        {
-            return GetCompanyShares().First().CurrentPrice;
-        }
+        public double ShareCurrentPrice => GetCompanyShares().First().CurrentPrice;
 
-        public string GetCompanySharePriceChangingTrand()
+        public string SharePriceChangingTrand()
         {
             return GetCompanyShares().First().PriceChangingTrand.GetEnumValueDescription();
         }
 
-        public double GetCompanyCost()
-        {
-            int count = GetCompanyShareCount();
-            double price = GetCompanyShareCurrentPrice();
-            return price * count;
-        }
+        public double CompanyCost => ShareCurrentPrice * ShareCount;
 
     }
 }

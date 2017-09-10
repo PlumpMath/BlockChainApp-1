@@ -54,8 +54,8 @@ namespace Logic.Storages
         public virtual TEntity GetLastEntity() 
             => GetAll().Last();
 
-        public virtual IEnumerable<TEntity> GetAll() 
-            =>_list.OrderBy(item => item.Id);
+        public virtual ICollection<TEntity> GetAll() 
+            =>_list.OrderBy(item => item.Id).ToArray();
 
         public virtual TEntity GetEntity(long id) 
             => GetAll().SingleOrDefault(item => item.Id == id);

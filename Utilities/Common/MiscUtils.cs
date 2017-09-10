@@ -43,7 +43,7 @@ namespace Utilities.Common
             return new Random(DateTime.Now.Millisecond + _randomSeed);
         }
 
-        public static string FormatDouble(double number, string format = "0.##")
+        public static string FormatDouble(this double number, string format = "0.##")
         {
             return number.ToString(format);
         }
