@@ -17,8 +17,8 @@ namespace Logic.Participants
         public static double MaxIncreaseDecreaseRate = 0.01;
         public static double MinIncreaseDecreaseRate = 0.005;
 
-        public static int RisknessDecreaseOwnedShareCount = 20;
-        public static int RisknessIncreaseOwnedShareCount = 100;
+        public static int RisknessDecreaseOwnedShareCount = 200;
+        public static int RisknessIncreaseOwnedShareCount = 500;
 
 
         public long Id { get; set; }
@@ -319,6 +319,8 @@ namespace Logic.Participants
                 .Select(id => Injector.Get<ICompanyStorage>().GetEntity(id))
                 .ToArray();
 
+            // TODO написать более умный выбор акций на продажу
+
             // Нахождение компании с отрицательным ростом, чтобы продать
             Company companyWithMinGrow = companies.GetCompanyWithMinimalGrow();
             if (companyWithMinGrow.CalculatePriceChangePercent() <= -10)
@@ -329,6 +331,8 @@ namespace Logic.Participants
                     .Where(share => share.CompanyId == companyWithMinGrow.Id)
                     .ToArray();
             }
+
+            
 
             // Нахождение максимального числа капитализации
             Company maxGrowCompany = companies
