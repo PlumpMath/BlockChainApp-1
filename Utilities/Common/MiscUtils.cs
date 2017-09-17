@@ -60,7 +60,7 @@ namespace Utilities.Common
                 enumValue.ToString();
         }
 
-        public static int CorrectRiskness(this int riskness, int max = 100, int min = 0)
+        public static int CorrectRiskness(this int riskness, int max, int min = 0)
         {
             if (riskness > max)
             {

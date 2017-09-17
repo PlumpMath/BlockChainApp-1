@@ -54,65 +54,136 @@ namespace Logic.Finance
         public void ExecuteExchanging()
         {
             var result = new ExchangeStepResult();
+
+            var sellOffersList = new List<SellDealOffer>();
+            var buyOffersList = new List<BuyDealOffer>();
+
+            // Формирование списка предложений о продаже
             foreach (IExchangeUser user in _exchangeUsers)
             {
-                
-                IExchangeUser buyer = user;
-                IExchangeUser seller = GetContrAgent(buyer.Id);
-                if (buyer.WannaMissTurn())
+                SellDealOffer offer = null;
+                if (!user.WannaMakeDeals() || (offer = user.GetSellDealOffer()) == null)
                 {
                     // Если участник-покупатель не захотел торговать сейчас
                     continue;
                 }
-                if (!TryMakeDeal(buyer, seller, out ShareInvoiceInfo invoice))
+
+                sellOffersList.Add(offer);
+            }
+
+            // Формирование списка предлжений о покупке
+            foreach (IExchangeUser user in _exchangeUsers)
+            {
+                BuyDealOffer offer = null;
+                if (!user.WannaMakeDeals() || (offer = user.GetBuyDealOffer()) == null)
                 {
+                    // Если участник-покупатель не захотел торговать сейчас
                     continue;
                 }
-                result.StepDealSumm += invoice.Cost;
-                result.StepDealBankComission += invoice.Comission;
-                result.StepDealCount++;
+
+                buyOffersList.Add(offer);
             }
+
+            ICollection<ConfirmedDeal> confirmedDeals = TryMatchOffers(sellOffersList, buyOffersList, 
+                out ICollection<SellDealOffer> firedDeals);
+
+            foreach (ConfirmedDeal deal in confirmedDeals)
+            {
+                if (!MakeDeal(deal))
+                {
+                    // Если сделка не удалась по некоторой причине
+                    continue;
+                }
+                result.StepDealCount++;
+                result.StepDealSumm += deal.Deal.SharesCost;
+            }
+
+            // оповещаем продавцом, чьи сделки не состоялись, об этом
+            foreach (SellDealOffer firedDeal in firedDeals)
+            {
+                IExchangeUser seller = GetUserByUniqueId(firedDeal.UniqueExhcangeUserId);
+                seller.NotifyAboutFiredSellOffer(firedDeal);
+            }
+
             if (result.StepDealCount != 0)
             {
-                // Если сделка состоялась, то сообщаем слушателям
+                // Если сделки состоялись, то сообщаем слушателям
                 ExchangeStepExecuted?.Invoke(result);
             }
         }
 
-        private bool TryMakeDeal(IExchangeUser buyer, IExchangeUser seller, out ShareInvoiceInfo invoice)
+        private static double SellBuyPriceMaxDifference = 0.1;
+
+        private ICollection<ConfirmedDeal> TryMatchOffers(
+            ICollection<SellDealOffer> sellDealOffers, 
+            ICollection<BuyDealOffer> buyDealOffers,
+            out ICollection<SellDealOffer> firedDeals)
         {
-            if (!seller.WannaSellShares(buyer.MakeInvoiceOffer(), out invoice))
+            // Список итоговых сопоставленных сделок
+            var deals = new List<ConfirmedDeal>();
+            firedDeals = new List<SellDealOffer>();
+
+            // Пробегаемся по списку предложений о продаже
+            foreach (SellDealOffer sell in sellDealOffers)
             {
-                return false;
+                BuyDealOffer buy = buyDealOffers
+                    .FirstOrDefault(b => IsDealsMatched(sell, b));
+                if (buy == null)
+                {
+                    // Если сделка не состоялась, нужно оповестить об этом владельца, пусть меняет тактику
+                    firedDeals.Add(sell);
+                    continue;
+                }
+
+                // если предложения о покупке и продаже совпадают, то добавляем в список подтвержденных сделок
+                // при этом корректиуем показатели сделки о продаже, чтобы совпадали
+
+                sell.Deal.ShareCount = buy.Deal.ShareCount <= sell.Deal.ShareCount
+                    ? buy.Deal.ShareCount
+                    : sell.Deal.ShareCount;
+                sell.Deal.SharesCost = sell.Deal.SharePrice * sell.Deal.ShareCount;
+                deals.Add(new ConfirmedDeal
+                {
+                    BuyerUniqueId = buy.UniqueExhcangeUserId,
+                    SellerUniqueId = sell.UniqueExhcangeUserId,
+                    Deal = sell.Deal
+                });
             }
+            return deals;
+        }
 
-            if (!buyer.WannaBuyShares(invoice))
-            {
-                // Если покупатель не захотел покупать акции по некоторой причине
-                seller.DecreaseSharePriceIfWantTo(invoice.CompanyId);
-                return false;
-            }
+        private bool IsDealsMatched(SellDealOffer sell, BuyDealOffer buy)
+        {
+            return buy.UniqueExhcangeUserId != sell.UniqueExhcangeUserId // Чтобы с самим собой сделка не случилась
+                    //&& buy.ShareCount <= sell.ShareCount // У покупатель хочет купить 
+                    && buy.Deal.ShareCompanyId == sell.Deal.ShareCompanyId // компании акций совпадают
+                    && Math.Abs(buy.Deal.SharePrice - sell.Deal.SharePrice) <= SellBuyPriceMaxDifference; // Если цены покупки и продажи близки по значению
+        }
 
-            seller.DeattachShares(invoice);
-            buyer.TakeShares(invoice);
+        private bool MakeDeal(ConfirmedDeal confirmedDeal)
+        {
+            IExchangeUser seller = GetUserByUniqueId(confirmedDeal.SellerUniqueId);
+            IExchangeUser buyer = GetUserByUniqueId(confirmedDeal.BuyerUniqueId);
 
-            if (!_bank.TransferMoney(buyer, seller, invoice.Cost, out double comission))
+            seller.DeattachShares(confirmedDeal.Deal);
+            buyer.TakeShares(confirmedDeal.Deal);
+
+            if (!_bank.TransferMoney(buyer, seller, confirmedDeal.Deal.SharesCost, out double comission))
             {
                 // Если по какой-то причине не получилось трансферинга денег
                 return false;
             }
-            invoice.Comission = comission;
             return true;
         }
 
-        /// <summary>
-        /// Возвращает рандомного контр-агента, но при этом исключается сам участник
-        /// </summary>
-        private IExchangeUser GetContrAgent(long excludeId)
+        private IExchangeUser GetUserById(long id)
         {
-            return _exchangeUsers
-                .Where(user => user.Id != excludeId)
-                .GetRandomEntity();
+            return _exchangeUsers.SingleOrDefault(user => user.Id == id);
+        }
+
+        private IExchangeUser GetUserByUniqueId(string uniqueId)
+        {
+            return _exchangeUsers.SingleOrDefault(user => user.UniqueExchangeId() == uniqueId);
         }
     }
 }

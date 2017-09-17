@@ -14,27 +14,22 @@ namespace Logic.Interfaces
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
-        bool WannaMissTurn();
-
-        /// <summary>
-        /// Хочет ли участник потратить деньги на акции
-        /// </summary>
-        bool WannaBuyShares(ShareInvoiceInfo invoice);
-
-        /// <summary>
-        /// Хочет ли участник продавать свои акции
-        /// </summary>
-        bool WannaSellShares(double offer, out ShareInvoiceInfo invoice); 
+        bool WannaMakeDeals();
 
         /// <summary>
         /// Отчуждение акций, которые были куплены другим участником в результате сделки
         /// </summary>
-        void DeattachShares(ShareInvoiceInfo invoice);
+        void DeattachShares(Deal deal);
 
         /// <summary>
         /// Прием акций, купленных в результате сделки
         /// </summary>
-        void TakeShares(ShareInvoiceInfo invoice);
+        void TakeShares(Deal deal);
+
+        /// <summary>
+        /// оповещаем участника, что его сделка не была осуществлена
+        /// </summary>
+        void NotifyAboutFiredSellOffer(SellDealOffer offer);
 
         /// <summary>
         /// Пользователь может понизить стоимость акций определенной компании, которые у него есть
@@ -46,10 +41,16 @@ namespace Logic.Interfaces
         /// </summary>
         void IncreaseSharePriceIfWantTo(long companyId);
 
-        double MakeInvoiceOffer();
+        double HowManyCouldSpendMoney();
 
         ICollection<Share> GetOwnedShares();
 
         ExchangeUserType GetExchangeUserType();
+
+        BuyDealOffer GetBuyDealOffer();
+
+        SellDealOffer GetSellDealOffer();
+
+
     }
 }

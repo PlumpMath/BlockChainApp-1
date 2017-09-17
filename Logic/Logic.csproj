@@ -53,11 +53,13 @@
     <Compile Include="Fabrics\CompanyFabric.cs" />
     <Compile Include="Fabrics\FabricBase.cs" />
     <Compile Include="Fabrics\ShareFabric.cs" />
+    <Compile Include="Finance\Deal.cs" />
+    <Compile Include="Finance\DealOffer.cs" />
+    <Compile Include="Finance\DealOfferType.cs" />
     <Compile Include="Finance\IPOExchangeInstitution.cs" />
     <Compile Include="Finance\ExchangeStepResult.cs" />
     <Compile Include="Finance\Share.cs" />
     <Compile Include="Extensions\ShareExtensions.cs" />
-    <Compile Include="Finance\ShareInvoiceInfo.cs" />
     <Compile Include="Helpers\ExchangeUserType.cs" />
     <Compile Include="Helpers\OwnedShareRepoController.cs" />
     <Compile Include="Helpers\SharePriceChangingType.cs" />
