@@ -62,7 +62,7 @@ namespace Logic.Participants
             else if (OwnedShareCount > RisknessIncreaseOwnedShareCount)
             {
                 // Если акций много, то желание торговаться уменьшается
-                riskness -= 40;
+                riskness -= 20;
             }
             return MakeRandomDecision(riskness);
         }
@@ -73,12 +73,12 @@ namespace Logic.Participants
             if (OwnedShareCount < RisknessDecreaseOwnedShareCount)
             {
                 // Если акций мало, то желание торговать повышается
-                riskness -= 40;
+                riskness -= 10;
             }
             else if (OwnedShareCount > RisknessIncreaseOwnedShareCount)
             {
                 // Если акций много, то желание торговаться уменьшается
-                riskness += 20;
+                riskness += 30;
             }
             return MakeRandomDecision(riskness);
         }

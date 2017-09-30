@@ -177,12 +177,7 @@ namespace Logic.Finance
             seller.DeattachShares(confirmedDeal.Deal);
             buyer.TakeShares(confirmedDeal.Deal);
 
-            if (!_bank.TransferMoney(buyer, seller, confirmedDeal.Deal.SharesCost, out double comission))
-            {
-                // Если по какой-то причине не получилось трансферинга денег
-                return false;
-            }
-            return true;
+            return _bank.TransferMoney(buyer, seller, confirmedDeal.Deal.SharesCost, out double comission);
         }
 
         private IExchangeUser GetUserByUniqueId(string uniqueId)
