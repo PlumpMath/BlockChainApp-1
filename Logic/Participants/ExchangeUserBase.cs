@@ -20,7 +20,6 @@ namespace Logic.Participants
         public static int RisknessDecreaseOwnedShareCount = 200;
         public static int RisknessIncreaseOwnedShareCount = 500;
 
-
         public long Id { get; set; }
 
         public DateTime CreatedAt { get; }
@@ -41,7 +40,7 @@ namespace Logic.Participants
         /// <returns></returns>
         private ICollection<Share> GetMineShares(long? companyId = null)
         {
-            var shares = Injector.Get<IShareStorage>().GetByOwnerId(this.UniqueExchangeId()).ToArray();
+            var shares = Injector.Get<IShareStorage>().GetByOwnerId(this.UniqueExchangeId());
             return companyId.HasValue 
                 ? shares.Where(share => share.CompanyId == companyId).ToArray()
                 : shares;
@@ -52,7 +51,7 @@ namespace Logic.Participants
         /// <summary>
         /// Участник может не захотеть вести торги на этот раз
         /// </summary>
-        public virtual bool WannaMakeDeals()
+        public virtual bool WannaMakeBuyDeals()
         {
             int riskness = GetCurrentRiskness();
             if (OwnedShareCount < RisknessDecreaseOwnedShareCount)
@@ -64,6 +63,22 @@ namespace Logic.Participants
             {
                 // Если акций много, то желание торговаться уменьшается
                 riskness -= 40;
+            }
+            return MakeRandomDecision(riskness);
+        }
+
+        public bool WannaMakeSellDeals()
+        {
+            int riskness = GetCurrentRiskness();
+            if (OwnedShareCount < RisknessDecreaseOwnedShareCount)
+            {
+                // Если акций мало, то желание торговать повышается
+                riskness -= 40;
+            }
+            else if (OwnedShareCount > RisknessIncreaseOwnedShareCount)
+            {
+                // Если акций много, то желание торговаться уменьшается
+                riskness += 20;
             }
             return MakeRandomDecision(riskness);
         }
@@ -84,8 +99,6 @@ namespace Logic.Participants
                 list.Add(invoiceShare);
             }
             deal.Shares = list;
-            // Раздумье, стоит ли повысить цену на акции, если хочет или остались в наличии
-            IncreaseSharePriceIfWantTo(deal.ShareCompanyId);
         }
 
         public void TakeShares(Deal deal)
@@ -104,21 +117,36 @@ namespace Logic.Participants
             }
             deal.Shares = list;
             Injector.Get<IShareStorage>().Save(list);
-            // На вновь полученные акции пользователь может захотеть повысить цену сразу
-            IncreaseSharePriceIfWantTo(deal.ShareCompanyId);
         }
 
         /// <summary>
         /// оповещаем пользователя о том, что его предложение о сделке не было осуществлено
         /// </summary>
-        public void NotifyAboutFiredSellOffer(SellDealOffer offer)
+        public void NotifyAboutFiredOffer(DealOffer offer)
         {
             // TODO Сделать более умное решение насчет сбрасывания цены
-            if (MakeRandomDecision())
-            {
-                // Если не купили акции, значит цена может быть завышенной
-                DecreaseSharePriceIfWantTo(offer.Deal.ShareCompanyId);
+            Action<long> action = null;
+            switch (offer.OfferType)
+            { 
+                case DealOfferType.Buy:
+                    // Если акции не были проданы по предложенной цене, значит она неадекватна
+                    action = IncreaseSharePriceIfWantTo;
+                    break;
+
+                case DealOfferType.Sell:
+                    // Если акции не были куплены по предложенной цене, значит она неадекватна
+                    action = DecreaseSharePriceIfWantTo;
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
+
+            //if (MakeRandomDecision())
+            //{
+            action.Invoke(offer.Deal.ShareCompanyId);
+            //}
+
         }
 
         public void DecreaseSharePriceIfWantTo(long companyId)
@@ -141,26 +169,19 @@ namespace Logic.Participants
         private void ChangeSharePriceIfWantTo(long companyId, SharePriceChangingType sharePriceChangingType)
         {
             ICollection<Share> mineShares = GetMineShares(companyId);
-            if (!WannaChangeAPrice(mineShares, out double? changeRate))
+            double changeRate;
+
+            if (!MakeRandomDecision() && mineShares.Any())
             {
                 // Если нет хочет/может повысить цену на акции
                 sharePriceChangingType = SharePriceChangingType.Fixed;
-                // return;
+                changeRate = 0;
             }
-            Injector.Get<IShareStorage>().ChangeShareCurrentPrice(companyId, changeRate ?? 0, sharePriceChangingType);
-        }
-
-        private bool WannaChangeAPrice(ICollection<Share> mineShares, out double? changeRate)
-        {
-            // Раздумье, стоит ли повысить цену на акции, если остались в наличии
-            if (!MakeRandomDecision() && mineShares.Any())
+            else
             {
-                // Если не хочет менять ничего, то завершение операции
-                changeRate = null;
-                return false;
+                changeRate = MiscUtils.GetRandomNumber(MaxIncreaseDecreaseRate, MinIncreaseDecreaseRate);
             }
-            changeRate = MiscUtils.GetRandomNumber(MaxIncreaseDecreaseRate, MinIncreaseDecreaseRate);
-            return true;
+            Injector.Get<IShareStorage>().ChangeShareCurrentPrice(companyId, changeRate, sharePriceChangingType);
         }
 
         public ICollection<Share> GetOwnedShares() => GetMineShares();

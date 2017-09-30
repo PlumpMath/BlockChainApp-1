@@ -83,7 +83,12 @@ namespace ExchangeApplication
             if (result != null)
             {
                 DisplayExchangeStepResult(new ExchangeStepResultViewModel(result, _exchangeStepCount));
-            }
+            }           
+        }
+
+        private void _exchangeTimer_Tick(object sender, EventArgs e)
+        {
+            _ipoExchangeInstitution.ExecuteExchanging();
 
             // Выплаты по депоситам, если наступил рубеж
             if (_depositPayoutTickCount == DepositPayoutTick)
@@ -95,11 +100,6 @@ namespace ExchangeApplication
             {
                 _depositPayoutTickCount++;
             }
-        }
-
-        private void _exchangeTimer_Tick(object sender, EventArgs e)
-        {
-            _ipoExchangeInstitution.ExecuteExchanging();
         }
 
         private void FillExchangeUsersList()

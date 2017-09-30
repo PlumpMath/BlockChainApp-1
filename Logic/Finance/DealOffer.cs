@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Logic.Interfaces;
-
-namespace Logic.Finance
+﻿namespace Logic.Finance
 {
     public class DealOffer
     {

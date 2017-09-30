@@ -12,9 +12,15 @@ namespace Logic.Interfaces
     {
         int OwnedShareCount { get; }
         /// <summary>
-        /// Участник может не захотеть вести торги на этот раз
+        /// Участник может не захотеть делах предложения о покупке
         /// </summary>
-        bool WannaMakeDeals();
+        bool WannaMakeBuyDeals();
+
+        /// <summary>
+        /// Участник может не захотеть делать предложения о продаже
+        /// </summary>
+        /// <returns></returns>
+        bool WannaMakeSellDeals();
 
         /// <summary>
         /// Отчуждение акций, которые были куплены другим участником в результате сделки
@@ -29,7 +35,7 @@ namespace Logic.Interfaces
         /// <summary>
         /// оповещаем участника, что его сделка не была осуществлена
         /// </summary>
-        void NotifyAboutFiredSellOffer(SellDealOffer offer);
+        void NotifyAboutFiredOffer(DealOffer offer);
 
         /// <summary>
         /// Пользователь может понизить стоимость акций определенной компании, которые у него есть

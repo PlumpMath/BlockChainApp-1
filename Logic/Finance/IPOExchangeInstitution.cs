@@ -62,7 +62,7 @@ namespace Logic.Finance
             foreach (IExchangeUser user in _exchangeUsers)
             {
                 SellDealOffer offer = null;
-                if (!user.WannaMakeDeals() || (offer = user.GetSellDealOffer()) == null)
+                if (!user.WannaMakeSellDeals() || (offer = user.GetSellDealOffer()) == null)
                 {
                     // Если участник-покупатель не захотел торговать сейчас
                     continue;
@@ -75,7 +75,7 @@ namespace Logic.Finance
             foreach (IExchangeUser user in _exchangeUsers)
             {
                 BuyDealOffer offer = null;
-                if (!user.WannaMakeDeals() || (offer = user.GetBuyDealOffer()) == null)
+                if (!user.WannaMakeBuyDeals() || (offer = user.GetBuyDealOffer()) == null)
                 {
                     // Если участник-покупатель не захотел торговать сейчас
                     continue;
@@ -84,8 +84,14 @@ namespace Logic.Finance
                 buyOffersList.Add(offer);
             }
 
-            ICollection<ConfirmedDeal> confirmedDeals = TryMatchOffers(sellOffersList, buyOffersList, 
-                out ICollection<SellDealOffer> firedDeals);
+            // предложения сделок, которые на этапе сопоставления остаются несвершившимися
+            List<DealOffer> remainOffers = sellOffersList
+                .Cast<DealOffer>()
+                .Concat(buyOffersList)
+                .ToList();
+
+            ICollection<ConfirmedDeal> confirmedDeals 
+                = TryMatchOffers(sellOffersList, buyOffersList, ref remainOffers);
 
             foreach (ConfirmedDeal deal in confirmedDeals)
             {
@@ -98,11 +104,11 @@ namespace Logic.Finance
                 result.StepDealSumm += deal.Deal.SharesCost;
             }
 
-            // оповещаем продавцом, чьи сделки не состоялись, об этом
-            foreach (SellDealOffer firedDeal in firedDeals)
+            //оповещаем участников, чьи сделки не состоялись, об этом
+            foreach (DealOffer offer in remainOffers)
             {
-                IExchangeUser seller = GetUserByUniqueId(firedDeal.UniqueExhcangeUserId);
-                seller.NotifyAboutFiredSellOffer(firedDeal);
+                GetUserByUniqueId(offer.UniqueExhcangeUserId)
+                    .NotifyAboutFiredOffer(offer);
             }
 
             if (result.StepDealCount != 0)
@@ -117,21 +123,18 @@ namespace Logic.Finance
         private ICollection<ConfirmedDeal> TryMatchOffers(
             ICollection<SellDealOffer> sellDealOffers, 
             ICollection<BuyDealOffer> buyDealOffers,
-            out ICollection<SellDealOffer> firedDeals)
+            ref List<DealOffer> remainOffers)
         {
             // Список итоговых сопоставленных сделок
             var deals = new List<ConfirmedDeal>();
-            firedDeals = new List<SellDealOffer>();
 
             // Пробегаемся по списку предложений о продаже
             foreach (SellDealOffer sell in sellDealOffers)
             {
-                BuyDealOffer buy = buyDealOffers
-                    .FirstOrDefault(b => IsDealsMatched(sell, b));
+                BuyDealOffer buy = buyDealOffers.FirstOrDefault(b => IsDealsMatched(sell, b));
                 if (buy == null)
                 {
-                    // Если сделка не состоялась, нужно оповестить об этом владельца, пусть меняет тактику
-                    firedDeals.Add(sell);
+                    // Если сделка не состоялась
                     continue;
                 }
 
@@ -142,12 +145,18 @@ namespace Logic.Finance
                     ? buy.Deal.ShareCount
                     : sell.Deal.ShareCount;
                 sell.Deal.SharesCost = sell.Deal.SharePrice * sell.Deal.ShareCount;
-                deals.Add(new ConfirmedDeal
+
+                var confirmedDeal = new ConfirmedDeal
                 {
                     BuyerUniqueId = buy.UniqueExhcangeUserId,
                     SellerUniqueId = sell.UniqueExhcangeUserId,
                     Deal = sell.Deal
-                });
+                };
+                deals.Add(confirmedDeal);
+
+                // Убираем из общего списка предложений те, которые свершились
+                remainOffers.Remove(buy);
+                remainOffers.Remove(sell);
             }
             return deals;
         }
@@ -174,11 +183,6 @@ namespace Logic.Finance
                 return false;
             }
             return true;
-        }
-
-        private IExchangeUser GetUserById(long id)
-        {
-            return _exchangeUsers.SingleOrDefault(user => user.Id == id);
         }
 
         private IExchangeUser GetUserByUniqueId(string uniqueId)

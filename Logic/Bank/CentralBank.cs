@@ -205,7 +205,7 @@ namespace Logic.Bank
                 // Должно быть оформление в виде транзакции
                 CreateTransaction(_bankExchangeUser, account.GetOwnerByBankAccount(), percent, 0);
             }
-            _observer?.CommonMessage($"Проценты по депозитьам {allPercents.FormatDouble()}");
+            _observer?.CommonMessage($"Проценты по депозитам {allPercents.FormatDouble()}");
             return allPercents;
         }
 
