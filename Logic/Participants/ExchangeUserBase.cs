@@ -193,6 +193,7 @@ namespace Logic.Participants
         {
             // Выбираем компанию, у которой будем покупать акции
             ICollection<Share> shares = ChooseCompanyShares();
+            if (shares == null) return null;
 
             double maxCosts = HowManyCouldSpendMoney();
 
